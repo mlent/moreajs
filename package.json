@@ -1,0 +1,22 @@
+{
+  "name": "moreajs",
+  "version": "0.0.0",
+  "description": "Plugin for creating and editing text alignments.",
+  "main": "src/morea.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlent/moreajs.git"
+  },
+  "author": "Monica Lent",
+  "license": "CC BY-SA 2.5",
+  "bugs": {
+    "url": "https://github.com/mlent/moreajs/issues"
+  },
+  "homepage": "https://github.com/mlent/moreajs",
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
+}
