@@ -1,0 +1,16 @@
+.morea {
+	
+	div {
+		display: block;
+		float: left;
+		width: 33%;
+
+		&.rtl {
+			direction: rtl;
+		}
+
+		span {
+			padding: 5px;
+		}
+	}
+}
