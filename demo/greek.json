@@ -10,7 +10,12 @@
 	 "pos":"article",
 	 "relation":"ATR",
 	 "id":1,
-	 "value":"οἱ"
+	 "value":"οἱ",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:4"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:2",
@@ -20,7 +25,8 @@
 	 "pos":"particle",
 	 "relation":"AuxY",
 	 "id":2,
-	 "value":"γὰρ"
+	 "value":"γὰρ",
+	 "translations": []
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:3",
@@ -33,7 +39,12 @@
 	 "pos":"adj",
 	 "relation":"SBJ",
 	 "id":3,
-	 "value":"Ἀθηναῖοι"
+	 "value":"Ἀθηναῖοι",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:5"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:4",
@@ -46,7 +57,15 @@
 	 "pos":"noun",
 	 "relation":"ADV",
 	 "id":4,
-	 "value":"τρόπῳ"
+	 "value":"τρόπῳ",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:1"
+		},
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:3"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:5",
@@ -59,7 +78,12 @@
 	 "pos":"pron",
 	 "relation":"ATR",
 	 "id":5,
-	 "value":"τοιῷδε"
+	 "value":"τοιῷδε",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:2"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:6",
@@ -76,6 +100,11 @@
 	 "tense":"aor",
 	 "value":"ἦλθον",
 	 "voice":"act"
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:6"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:7",
@@ -86,7 +115,12 @@
 	 "pos":"prep",
 	 "relation":"AuxP",
 	 "id":7,
-	 "value":"ἐπὶ"
+	 "value":"ἐπὶ",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:7"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:8",
@@ -100,7 +134,12 @@
 	 "pos":"article",
 	 "relation":"ATR",
 	 "id":8,
-	 "value":"τὰ"
+	 "value":"τὰ",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:8"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:9",
@@ -113,7 +152,12 @@
 	 "pos":"noun",
 	 "relation":"OBJ",
 	 "id":9,
-	 "value":"πράγματα"
+	 "value":"πράγματα",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:9"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:10",
@@ -124,7 +168,12 @@
 	 "pos":"prep",
 	 "relation":"AuxP",
 	 "id":10,
-	 "value":"ἐν"
+	 "value":"ἐν",
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:10"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:11",
@@ -138,7 +187,10 @@
 	 "pos":"pron",
 	 "relation":"ADV",
 	 "id":11,
-	 "value":"οἷς"
+	 "value":"οἷς",
+	 "translations": [
+		"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:11"
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:12",
@@ -154,6 +206,17 @@
 	 "tense":"aor",
 	 "value":"ηὐξήθησαν",
 	 "voice":"pass"
+	 "translations": [
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:13"
+		},
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:14"
+		},
+		{
+			"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:15"
+		}
+	 ]
 	},
 	{
 	 "CTS":"urn:cts:greekLit:tlg0003.tlg001.perseus-grc1:1.89.1:13",
@@ -164,6 +227,9 @@
 	 "pos":"punct",
 	 "relation":"AuxK",
 	 "id":13,
-	 "value":"."
+	 "value":".",
+	 "translations": [
+		"CTS": "urn:cts:greekLit:tlg0003.tlg001.perseus-eng:1.89.1:16"
+	 ]
 	}
 ]
