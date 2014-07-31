@@ -116,11 +116,18 @@ define(function() {
 
 		// For each sentence, add words inside a subcontainer
 		for (var i = 0; i < this.data.length; i++) {
-			var el = document.createElement('div');
+			var el = document.createElement('div'), lang = '';
 			el.className = 'sentence';
 
 			// HACK, til we have lang attrs
 			if (this.data[i].CTS.indexOf('fas') !== -1)
+				lang = 'fas';
+			else if (this.data[i].CTS.indexOf('eng') !== -1)
+				lang = 'eng';
+			else
+				lang = 'grc';
+
+			if (lang === 'fas')
 				el.className += ' rtl';
 
 			for (var j = 0; j < this.data[i].words.length; j++) {
@@ -133,6 +140,7 @@ define(function() {
 
 				word.setAttribute('data-translations', translations);
 				word.setAttribute('data-cts', this.data[i].words[j].CTS);
+				word.setAttribute('lang', lang);
 
 				word.addEventListener("mouseover", this.showAligned.bind(this));
 				word.addEventListener("mouseout", this.hideAligned.bind(this));

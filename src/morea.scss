@@ -1,5 +1,16 @@
+$greek-font: Cambria, Serif;
+$main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif; 
+
 .morea {
+
+	font-family: $main-font;
+	line-height: 36px;
 	
+	*[lang="grc"] {
+		font-family: $greek-font;
+		letter-spacing: 1px;
+	}
+
 	div {
 		display: block;
 		float: left;
@@ -10,14 +21,15 @@
 		}
 
 		.aligned {
-			background-color: #EEE;
+			background-color: #FCEBD6;
 		}
 
 		span {
 			padding: 5px;
 
 			&:hover {
-				background-color: #DDD;
+				background-color: #F8D3A7;
+				cursor: pointer;
 			}
 		}
 	}

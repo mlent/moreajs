@@ -1,12 +1,19 @@
-.morea div {
-  display: block;
-  float: left;
-  width: 33%; }
-  .morea div.rtl {
-    direction: rtl; }
-  .morea div .aligned {
-    background-color: #EEE; }
-  .morea div span {
-    padding: 5px; }
-    .morea div span:hover {
-      background-color: #DDD; }
+.morea {
+  font-family: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  line-height: 36px; }
+  .morea *[lang="grc"] {
+    font-family: Cambria, Serif;
+    letter-spacing: 1px; }
+  .morea div {
+    display: block;
+    float: left;
+    width: 33%; }
+    .morea div.rtl {
+      direction: rtl; }
+    .morea div .aligned {
+      background-color: #FCEBD6; }
+    .morea div span {
+      padding: 5px; }
+      .morea div span:hover {
+        background-color: #F8D3A7;
+        cursor: pointer; }
