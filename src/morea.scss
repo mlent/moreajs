@@ -11,25 +11,74 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 		letter-spacing: 1px;
 	}
 
-	div {
+	.header {
 		display: block;
-		float: left;
+		background-color: #EEE;
+		padding: 5px;
+		text-align: right;
+
+		a {
+			color: #1FADAD;
+			text-decoration: none;
+		}
+	}
+
+	.sentence {
+		display: inline-block;
 		width: 33%;
+		min-width: 200px;
+		padding: 5px 10px;
+		box-sizing: border-box;
+		position: relative;
+
+		&:not(:last-child) {
+			border-right: 1px solid #DDD;
+		}
 
 		&.rtl {
 			direction: rtl;
+
+			a {
+				left: 5px;
+				right: auto;
+			}
 		}
 
-		.aligned {
-			background-color: #FCEBD6;
+		a {
+			display: inline-block;
+			position: absolute;
+			top: 0;
+			right: 0;
+			text-decoration: none;
+			color: #FFF;
+			background-color: #1FADAD;
+			height: 10px;
+			padding: 3px 5px;
+			font-size: 12px;
+			line-height: 10px;
+			border-radius: 15px;
+			margin: 10px;
+
+			&:hover {
+				background-color: #D15241;
+			}
 		}
+
 
 		span {
 			padding: 5px;
 
 			&:hover {
-				background-color: #F8D3A7;
+				background-color: #F8D3A7 !important;
 				cursor: pointer;
+			}
+
+			&.hovered {
+				background-color: #FCEBD6;
+			}
+
+			&.aligned {
+				border-bottom: 1px solid #DDD; 
 			}
 		}
 	}

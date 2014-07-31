@@ -70,7 +70,7 @@ define(function() {
 
 		for (var i = 0; i < wordNodes.length; i++) {
 			if (matches.indexOf(wordNodes[i].dataset.cts) !== -1) 
-				wordNodes[i].className = 'aligned';
+				wordNodes[i].className += ' hovered';
 		}
 
 	};
@@ -79,7 +79,7 @@ define(function() {
 		var wordNodes = this.el.querySelectorAll('span');
 
 		for (var i = 0; i < wordNodes.length; i++)
-			wordNodes[i].className = '';
+			wordNodes[i].removeClass('hovered');
 	};
 
 	morea.prototype._getAllRelatedAlignments = function(translations) {
@@ -114,6 +114,17 @@ define(function() {
 
 		this.el.innerHTML = '';
 
+		// Add header
+		var header = document.createElement('div');
+		header.className = 'header';
+
+		var addLink = document.createElement('a');
+		addLink.innerHTML = 'Add Translation';
+		addLink.setAttribute('href', '#');
+		header.appendChild(addLink);
+
+		this.el.appendChild(header);
+
 		// For each sentence, add words inside a subcontainer
 		for (var i = 0; i < this.data.length; i++) {
 			var el = document.createElement('div'), lang = '';
@@ -130,6 +141,14 @@ define(function() {
 			if (lang === 'fas')
 				el.className += ' rtl';
 
+			if (lang !== 'grc') {
+				var x = document.createElement('a');
+				x.setAttribute('href', '#');
+				x.setAttribute('title', 'Close Translation');
+				x.innerHTML = 'x';
+				el.appendChild(x);
+			}
+
 			for (var j = 0; j < this.data[i].words.length; j++) {
 				var word = document.createElement('span');
 				word.innerHTML = this.data[i].words[j].value;
@@ -137,6 +156,9 @@ define(function() {
 				var translations = this.data[i].words[j].translations.map(function(word) {
 					return word.CTS;
 				}).toString();
+
+				if (translations.length > 0)
+					word.className = 'aligned';
 
 				word.setAttribute('data-translations', translations);
 				word.setAttribute('data-cts', this.data[i].words[j].CTS);
@@ -188,6 +210,18 @@ define(function() {
 
 		return found;
 	};
+
+	if (!HTMLElement.prototype.removeClass) {
+		HTMLElement.prototype.removeClass = function(remove) {
+			var newList = '';
+			var classes = this.className.split(" ");
+			for (var i = 0; i < classes.length; i++) {
+				if (classes[i] !== remove)
+					newList += classes[i] + " ";
+			}
+			this.className = newList.trim();
+		};
+	}
 
 	return morea;
 
