@@ -62,6 +62,51 @@ define(function() {
 		return out;
 	};
 
+	morea.prototype.showAligned = function(e) {
+		var translations = e.toElement.dataset.translations.split(",");
+		var wordNodes = this.el.querySelectorAll('span');
+
+		var matches = this._getAllRelatedAlignments(translations);
+
+		for (var i = 0; i < wordNodes.length; i++) {
+			if (matches.indexOf(wordNodes[i].dataset.cts) !== -1) 
+				wordNodes[i].className = 'aligned';
+		}
+
+	};
+
+	morea.prototype.hideAligned = function(e) {
+		var wordNodes = this.el.querySelectorAll('span');
+
+		for (var i = 0; i < wordNodes.length; i++)
+			wordNodes[i].className = '';
+	};
+
+	morea.prototype._getAllRelatedAlignments = function(translations) {
+		var alignments = [];
+		var words = [].concat.apply([], this.data.map(function(sentence) {
+			return sentence.words;
+		}));
+		
+		// First run though, get all connected words
+		for (var i = 0; i < words.length; i++) {
+			if (alignments.indexOf(words[i].CTS) === -1 && translations.indexOf(words[i].CTS) !== -1) {
+				alignments.push(words[i].CTS);
+			}
+		}
+		
+		// Then get all words where a word in alignments is in one of their translations
+		for (var i = 0; i < words.length; i++) {
+			var toCheck = words[i].translations.map(function(el) {
+				return el.CTS;	
+			});
+			if (this._anyMatchInArray(alignments, toCheck))
+				alignments.push(words[i].CTS);
+		}
+
+		return alignments;
+	};
+
 	morea.prototype.render = function(e) {
 		
 		if (this.el.className.indexOf('morea') === -1)
@@ -74,17 +119,32 @@ define(function() {
 			var el = document.createElement('div');
 			el.className = 'sentence';
 
-			for (var j = 0; j < this.data[i].length; j++) {
+			// HACK, til we have lang attrs
+			if (this.data[i].CTS.indexOf('fas') !== -1)
+				el.className += ' rtl';
+
+			for (var j = 0; j < this.data[i].words.length; j++) {
 				var word = document.createElement('span');
-				word.innerHTML = this.data[i][j].value;
+				word.innerHTML = this.data[i].words[j].value;
+
+				var translations = this.data[i].words[j].translations.map(function(word) {
+					return word.CTS;
+				}).toString();
+
+				word.setAttribute('data-translations', translations);
+				word.setAttribute('data-cts', this.data[i].words[j].CTS);
+
+				word.addEventListener("mouseover", this.showAligned.bind(this));
+				word.addEventListener("mouseout", this.hideAligned.bind(this));
+
 				el.appendChild(word);
 				el.appendChild(document.createTextNode(' '));
 			}
 
 			this.el.appendChild(el);
 		}
-
 	};
+
 
 	// ------------------------- //
 	// Utility Functions         //
@@ -103,6 +163,22 @@ define(function() {
 		}
 
 		return out;
+	};
+
+	morea.prototype._anyMatchInArray = function(target, toMatch) {
+		var found = false, map = {}, i, j, current;
+
+		for (i = 0, j = target.length; i < j; i++) {
+			current = target[i];
+			map[current] = true;
+		}
+
+		for (i = 0, j = toMatch.length; !found && (i < j); i++) {
+			current = toMatch[i];
+			found = !!map[current];
+		}
+
+		return found;
 	};
 
 	return morea;

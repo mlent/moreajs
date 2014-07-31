@@ -9,8 +9,16 @@
 			direction: rtl;
 		}
 
+		.aligned {
+			background-color: #EEE;
+		}
+
 		span {
 			padding: 5px;
+
+			&:hover {
+				background-color: #DDD;
+			}
 		}
 	}
 }

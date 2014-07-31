@@ -1,1 +1,12 @@
-.morea div{display:block;float:left;width:33%;}.morea div.rtl{direction:rtl;}.morea div span{padding:5px;}
+.morea div {
+  display: block;
+  float: left;
+  width: 33%; }
+  .morea div.rtl {
+    direction: rtl; }
+  .morea div .aligned {
+    background-color: #EEE; }
+  .morea div span {
+    padding: 5px; }
+    .morea div span:hover {
+      background-color: #DDD; }

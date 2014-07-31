@@ -14,36 +14,28 @@ require(['morea'], function(Morea) {
 
 	new Morea('div', { 
 		mode: 'edit',
-		dataUrl: 'data.json',
+		dataUrl: 'http://139.18.40.154:8000/api/v1/sentence/11/?full=True',
 		lang: 'eng',
 		callback: function(response_text) {
 			var data = JSON.parse(response_text);
-			this.translations = Object.keys(data.translations); 
+			this.langs = Object.keys(data.translations); 
 
+			// TODO: Streamline data acquisition, make async w/ event handling
 			// Create array of sentence objects
 			var sentences = [];
-			sentences[0] = data.words;
-			
-			for (var i = 0; i < sentences[0].length; i++) {
-				var word = sentences[0][i];
+			sentences[0] = data;
 
-				for (var j = 0; j < this.translations.length; j++) {
-					var lang = this.translations[j];
-
-					// HACK, 'til we have the lang attr avail on words
-					var words = word.translations.filter(function(trans) {
-						trans.lang = lang;					
-						return trans.CTS.indexOf(lang) !== -1;
-					});
-
-					if (sentences[j+1] === undefined) { 
-						sentences[j+1] = [];
-					}
-
-					sentences[j+1] = sentences[j+1].concat(words); 
-
-				}
-
+			// Get other translations
+			for (var i = 0; i < this.langs.length; i++) {
+				var request = new XMLHttpRequest();
+				request.open('GET', data.translations[this.langs[i]] + '?full=True', false);
+				request.onload = function() {
+					if (request.status >= 200 && request.status < 400)
+						sentences[i+1] = JSON.parse(request.responseText);
+					else
+						console.log("Error fetching document at " + data.translations[this.langs[i]]);
+				};
+				request.send();
 			}
 
 			return sentences;
