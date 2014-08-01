@@ -4,14 +4,49 @@
   .morea *[lang="grc"] {
     font-family: Cambria, Serif;
     letter-spacing: 1px; }
+  .morea form {
+    display: none; }
+    .morea form.open {
+      text-align: left;
+      display: block;
+      height: 120px; }
+    .morea form label[for="token-option"] {
+      display: block; }
+    .morea form select {
+      display: block; }
+    .morea form textarea {
+      box-sizing: border-box;
+      width: 50%;
+      float: left;
+      min-height: 130px;
+      font-size: 14px;
+      line-height: 24px;
+      margin-right: 10px; }
+    .morea form label {
+      margin: 5px; }
+    .morea form input[type="radio"], .morea form input[type="checkbox"] {
+      vertical-align: middle;
+      margin-right: 5px; }
+    .morea form button {
+      border: 0;
+      background-color: #4E6087;
+      color: #FFF;
+      padding: 5px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      margin: 5px;
+      display: block; }
   .morea .header {
     display: block;
     background-color: #EEE;
-    padding: 5px;
-    text-align: right; }
+    padding: 10px;
+    overflow: auto;
+    width: 100%;
+    box-sizing: border-box; }
     .morea .header a {
       color: #1FADAD;
-      text-decoration: none; }
+      text-decoration: none;
+      float: right; }
   .morea .sentence {
     display: inline-block;
     width: 33%;

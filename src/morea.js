@@ -107,6 +107,117 @@ define(function() {
 		return alignments;
 	};
 
+	morea.prototype.toggleForm = function(e) {
+		e.preventDefault();
+
+		var form = this.header.querySelector('form');
+		if (form !== null && form.className !== 'open') {
+			form.className = 'open';
+			e.toElement.innerHTML = 'Close';
+		}
+		else if (form !== null && form.className === 'open') { 
+			form.className = '';
+			e.toElement.innerHTML = 'Add Translation';
+		}
+		else {
+			e.toElement.innerHTML = 'Close';
+			this._renderForm();
+			this.header.querySelector('form').className = 'open';
+		}
+	};
+
+	morea.prototype._renderForm = function(e) {
+		var form = document.createElement('form');
+		var langSelector = document.createElement('select');
+		langSelector.setAttribute('name', 'lang');
+
+		// TODO: make this external setting, not hardcoded
+		var langs = [
+			{
+				"hr": "English",
+				"code": "eng",
+				"dir": "ltr"
+			},
+			{
+				"hr": "Français",
+				"code": "fra",
+				"dir": "ltr"
+			},
+			{
+				"hr": "فارسی",
+				"code": "fas",
+				"dir": "rtl"
+			}
+		];
+
+		var opt = document.createElement('option');
+		opt.innerHTML = 'Select Language';
+
+		for (var i = 0; i < langs.length; i++) {
+			var option = document.createElement('option');
+			option.setAttribute('value', langs[i].code);
+			option.innerHTML = langs[i].hr;
+			option.setAttribute('data-text-direction', langs[i].dir);
+			langSelector.appendChild(option);
+		}
+
+		var textBox = document.createElement('textarea');
+
+		var textDirLabel = document.createElement('label');
+		textDirLabel.innerHTML = 'Text Direction: '; 
+
+		var ltrRadio = document.createElement('input');
+		ltrRadio.setAttribute('type', 'radio');
+		ltrRadio.setAttribute('name', 'textdirection');
+		ltrRadio.setAttribute('value', 'ltr');
+		ltrRadio.setAttribute('id', 'ltr-radio');
+
+		var ltrRadioLabel = document.createElement('label');
+		ltrRadioLabel.setAttribute('for', 'ltr-radio');
+
+		ltrRadioLabel.appendChild(ltrRadio);
+		ltrRadioLabel.innerHTML += 'Left to Right';
+
+		var rtlRadio = document.createElement('input');
+		rtlRadio.setAttribute('type', 'radio');
+		rtlRadio.setAttribute('name', 'textdirection');
+		rtlRadio.setAttribute('value', 'rtl');
+		rtlRadio.setAttribute('id', 'rtl-radio');
+
+		var rtlRadioLabel = document.createElement('label');
+		rtlRadioLabel.setAttribute('for', 'rtl-radio');
+
+		rtlRadioLabel.appendChild(rtlRadio);
+		rtlRadioLabel.innerHTML += 'Right to Left';
+
+		var tokenOption = document.createElement('label');
+		tokenOption.setAttribute('for', 'token-option');
+
+		var checkbox = document.createElement('input');
+		checkbox.setAttribute('type', 'checkbox');
+		checkbox.setAttribute('id', 'token-option');
+		checkbox.setAttribute('name', 'tokenize-punctuation');
+		checkbox.setAttribute('value', 'true');
+
+		tokenOption.appendChild(checkbox);
+		tokenOption.innerHTML += 'Split punctuation as tokens';
+
+		var btn = document.createElement('button');
+		btn.setAttribute('type', 'submit');
+		btn.setAttribute('value', 'Align Text');
+		btn.innerHTML = 'Align Text';
+
+		form.appendChild(textBox);
+		form.appendChild(langSelector);
+		form.appendChild(textDirLabel);
+		form.appendChild(ltrRadioLabel);
+		form.appendChild(rtlRadioLabel);
+		form.appendChild(tokenOption);
+		form.appendChild(btn);
+
+		this.header.appendChild(form);
+	};
+
 	morea.prototype.render = function(e) {
 		
 		if (this.el.className.indexOf('morea') === -1)
@@ -115,15 +226,16 @@ define(function() {
 		this.el.innerHTML = '';
 
 		// Add header
-		var header = document.createElement('div');
-		header.className = 'header';
+		this.header = document.createElement('div');
+		this.header.className = 'header';
 
 		var addLink = document.createElement('a');
 		addLink.innerHTML = 'Add Translation';
 		addLink.setAttribute('href', '#');
-		header.appendChild(addLink);
+		addLink.addEventListener('click', this.toggleForm.bind(this));
 
-		this.el.appendChild(header);
+		this.header.appendChild(addLink);
+		this.el.appendChild(this.header);
 
 		// For each sentence, add words inside a subcontainer
 		for (var i = 0; i < this.data.length; i++) {
@@ -145,7 +257,7 @@ define(function() {
 				var x = document.createElement('a');
 				x.setAttribute('href', '#');
 				x.setAttribute('title', 'Close Translation');
-				x.innerHTML = 'x';
+				x.innerHTML = '&times;';
 				el.appendChild(x);
 			}
 
