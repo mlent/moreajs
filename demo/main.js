@@ -14,7 +14,7 @@ require(['morea'], function(Morea) {
 
 	new Morea('div', { 
 		mode: 'edit',
-		dataUrl: 'http://139.18.40.154:8000/api/v1/sentence/11/?full=True',
+		dataUrl: 'http://139.18.40.154:8000/api/v1/sentence/401/?full=True',
 		lang: 'eng',
 		callback: function(response_text) {
 			var data = JSON.parse(response_text);

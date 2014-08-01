@@ -76,7 +76,7 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 		display: inline-block;
 		width: 33%;
 		min-width: 200px;
-		padding: 5px 10px;
+		padding: 5px 20px;
 		box-sizing: border-box;
 		position: relative;
 
@@ -113,6 +113,19 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 			}
 		}
 
+		&.editing {
+			span {
+				&.selected {
+					background-color: #FFCB7C !important; 
+				}
+
+				/* Unaligned, new link */
+				&:hover {
+					background-color: #9AE738;
+				}
+			}
+		}
+
 
 		span {
 			padding: 5px;
@@ -123,11 +136,22 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 			}
 
 			&.hovered {
-				background-color: #FCEBD6;
+				background-color: #FCEBD6 !important;
 			}
 
 			&.aligned {
-				border-bottom: 1px solid #DDD; 
+				border-bottom: 2px solid #DDD; 
+			}
+
+			&.linked {
+
+				background-color: #FADCB0;
+
+				/* Already aligned, de-link*/
+				&:hover {
+					color: #FFF;
+					background-color: #F00 !important;
+				}
 			}
 		}
 	}

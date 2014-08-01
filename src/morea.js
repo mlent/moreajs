@@ -62,7 +62,11 @@ define(function() {
 		return out;
 	};
 
-	morea.prototype.showAligned = function(e) {
+	morea.prototype.focusNode = function(e) {
+
+
+		// Otherwise, show display hover status
+		
 		var translations = e.toElement.dataset.translations.split(",");
 		var wordNodes = this.el.querySelectorAll('span');
 
@@ -70,12 +74,95 @@ define(function() {
 
 		for (var i = 0; i < wordNodes.length; i++) {
 			if (matches.indexOf(wordNodes[i].dataset.cts) !== -1) 
-				wordNodes[i].className += ' hovered';
+				wordNodes[i].addClass('hovered');
 		}
 
 	};
 
-	morea.prototype.hideAligned = function(e) {
+	morea.prototype.editNode = function(e) {
+		this.unfocusNodes();
+		var wordNodes = this.el.querySelectorAll('span');
+
+		// Select this node, make appropriate nodes editable
+		if (e.toElement.className.indexOf('selected') !== -1) {
+			e.toElement.removeClass('selected');
+			e.toElement.parentElement.removeClass('editing');
+
+			for (var i = 0; i < wordNodes.length; i++) {
+				wordNodes[i].removeClass('linked');
+			}
+			return;
+		}
+
+		// If this word is already aligned, display editing functionality
+		if (e.toElement.parentElement.className.indexOf('editing') !== -1) {
+			if (e.toElement.className.indexOf('linked') !== -1)
+				this.createLink(e);
+			else
+				this.removeLink(e);
+
+			return;
+		}
+
+		// Otherwise, "intialize" editing environment
+		e.toElement.addClass('selected');
+		var sentenceNodes = this.el.querySelectorAll('.sentence');
+		var translations = e.toElement.dataset.translations.split(",");
+		var matches = this._getAllRelatedAlignments(translations);
+
+		// Skip first sentence, which is Original Version
+		for (var i = 1; i < sentenceNodes.length; i++) {
+			sentenceNodes[i].addClass('editing');
+		}
+
+		// Assign all currently linked to "linked"
+		for (var i = 0; i < wordNodes.length; i++) {
+			if (matches.indexOf(wordNodes[i].dataset.cts) !== -1) 
+				wordNodes[i].addClass('linked');
+		}
+	};
+
+	morea.prototype.createLink = function(e) {
+		console.log("create link");
+		e.toElement.addClass('linked');
+
+		// Update our internal data structure
+		var targetCTS = e.toElement.dataset.cts;
+		var links = this.el.querySelectorAll('.linked').map(function(node) {
+			return node.dataset.cts;
+		});
+		var words = [].concat.apply([], this.data.map(function(sentence) {
+			return sentence.words;
+		})).filter(function(word) {
+			return this._anyMatchInArray(links, word.CTS);
+		});
+		
+		console.log("words that should all be connected", words);
+		
+		// Update UI
+		var sentenceNodes = this.el.querySelectorAll('.sentence');
+
+	};
+
+	morea.prototype.insertTranslation = function(words, link) {
+
+	};
+
+	morea.prototype.removeTranslation = function(word, translationLinks) {
+
+	}
+
+	morea.prototype.removeLink = function(e) {
+		console.log("remove link");
+		e.toElement.removeClass('linked');
+
+		// Update our internal data structure
+
+		// Update the element's data-translations field
+	};
+
+	morea.prototype.unfocusNodes = function(e) {
+		
 		var wordNodes = this.el.querySelectorAll('span');
 
 		for (var i = 0; i < wordNodes.length; i++)
@@ -206,6 +293,7 @@ define(function() {
 		btn.setAttribute('type', 'submit');
 		btn.setAttribute('value', 'Align Text');
 		btn.innerHTML = 'Align Text';
+		btn.addEventListener('click', this.addTranslation.bind(this));
 
 		form.appendChild(textBox);
 		form.appendChild(langSelector);
@@ -216,6 +304,36 @@ define(function() {
 		form.appendChild(btn);
 
 		this.header.appendChild(form);
+	};
+
+	morea.prototype.addTranslation = function(e) {
+		e.preventDefault();
+
+		var form = this.header.querySelector('form');
+		var sentence = form.querySelector('textarea').value.split(" ");
+		var lang = form.querySelector('select').value;
+		var words = [];
+
+		for (var i = 0; i < sentence.length; i++) {
+			words.push({
+				value: sentence[i],
+				lang: lang,
+				length: sentence[i].length,
+				translations: [],
+				CTS: 'urn:cts:greekLit:tlg0003.tlg001.perseus-' + 'test' + /*lang*/ + ':1.89.1:' + (i + 1) 	// TODO: obviously replace
+			});
+		}
+
+		var sentence = {
+			CTS: 'urn:cts:greekLit:tlg0003.tlg001.perseus-' + 'test' + /*lang*/ + ':1.89.1',
+			length: words.length,
+			sentence: form.querySelector('textarea').value.trim(),
+			translations: {},																	// TODO: obv. replace
+			words: words
+		};
+
+		this.data.splice(1, 0, sentence);
+		this.render();
 	};
 
 	morea.prototype.render = function(e) {
@@ -276,8 +394,9 @@ define(function() {
 				word.setAttribute('data-cts', this.data[i].words[j].CTS);
 				word.setAttribute('lang', lang);
 
-				word.addEventListener("mouseover", this.showAligned.bind(this));
-				word.addEventListener("mouseout", this.hideAligned.bind(this));
+				word.addEventListener("mouseover", this.focusNode.bind(this));
+				word.addEventListener("mouseout", this.unfocusNodes.bind(this));
+				word.addEventListener("click", this.editNode.bind(this));
 
 				el.appendChild(word);
 				el.appendChild(document.createTextNode(' '));
@@ -332,6 +451,15 @@ define(function() {
 					newList += classes[i] + " ";
 			}
 			this.className = newList.trim();
+		};
+	}
+
+	if (!HTMLElement.prototype.addClass) {
+		HTMLElement.prototype.addClass = function(add) {
+			if (this.className.indexOf('add') === -1)
+				this.className += ' ' + add;
+
+			this.className.trim();
 		};
 	}
 

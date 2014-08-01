@@ -51,7 +51,7 @@
     display: inline-block;
     width: 33%;
     min-width: 200px;
-    padding: 5px 10px;
+    padding: 5px 20px;
     box-sizing: border-box;
     position: relative; }
     .morea .sentence:not(:last-child) {
@@ -77,12 +77,24 @@
       margin: 10px; }
       .morea .sentence a:hover {
         background-color: #D15241; }
+    .morea .sentence.editing span {
+      /* Unaligned, new link */ }
+      .morea .sentence.editing span.selected {
+        background-color: #FFCB7C !important; }
+      .morea .sentence.editing span:hover {
+        background-color: #9AE738; }
     .morea .sentence span {
       padding: 5px; }
       .morea .sentence span:hover {
         background-color: #F8D3A7 !important;
         cursor: pointer; }
       .morea .sentence span.hovered {
-        background-color: #FCEBD6; }
+        background-color: #FCEBD6 !important; }
       .morea .sentence span.aligned {
-        border-bottom: 1px solid #DDD; }
+        border-bottom: 2px solid #DDD; }
+      .morea .sentence span.linked {
+        background-color: #FADCB0;
+        /* Already aligned, de-link*/ }
+        .morea .sentence span.linked:hover {
+          color: #FFF;
+          background-color: #F00 !important; }
