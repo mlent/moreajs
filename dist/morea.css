@@ -1,6 +1,146 @@
 .morea {
   font-family: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-  line-height: 36px; }
+  line-height: 36px;
+  @-moz-keyframes spin {
+    0% {
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg); }
+
+    100% {
+      -moz-transform: rotate(359deg);
+      -o-transform: rotate(359deg);
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg); } }
+
+  @-webkit-keyframes spin {
+    0% {
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg); }
+
+    100% {
+      -moz-transform: rotate(359deg);
+      -o-transform: rotate(359deg);
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg); } }
+
+  @-o-keyframes spin {
+    0% {
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg); }
+
+    100% {
+      -moz-transform: rotate(359deg);
+      -o-transform: rotate(359deg);
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg); } }
+
+  @-ms-keyframes spin {
+    0% {
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg); }
+
+    100% {
+      -moz-transform: rotate(359deg);
+      -o-transform: rotate(359deg);
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg); } }
+
+  @keyframes spin {
+    0% {
+      -moz-transform: rotate(0deg);
+      -o-transform: rotate(0deg);
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg); }
+
+    100% {
+      -moz-transform: rotate(359deg);
+      -o-transform: rotate(359deg);
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg); } }
+
+  @font-face {
+    font-family: 'font';
+    src: url("../font/font.eot?22347261");
+    src: url("../font/font.eot?22347261#iefix") format("embedded-opentype"), url("../font/font.woff?22347261") format("woff"), url("../font/font.ttf?22347261") format("truetype"), url("../font/font.svg?22347261#font") format("svg");
+    font-weight: normal;
+    font-style: normal; }
+
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */
+  /* '' */ }
+  .morea .animate-spin {
+    -moz-animation: spin 2s infinite linear;
+    -o-animation: spin 2s infinite linear;
+    -webkit-animation: spin 2s infinite linear;
+    animation: spin 2s infinite linear;
+    display: inline-block; }
+  .morea [class^="icon-"]:before, .morea [class*=" icon-"]:before {
+    font-family: "font";
+    font-style: normal;
+    font-weight: normal;
+    speak: none;
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: .2em;
+    text-align: center;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1em;
+    margin-left: .2em; }
+  .morea .icon-link:before {
+    content: '\e800'; }
+  .morea .icon-resize-small-alt:before {
+    content: '\e802'; }
+  .morea .icon-resize-horizontal:before {
+    content: '\e803'; }
+  .morea .icon-pencil:before {
+    content: '\e805'; }
+  .morea .icon-flow-merge:before {
+    content: '\e806'; }
+  .morea .icon-flow-cross:before {
+    content: '\e807'; }
+  .morea .icon-flow-split:before {
+    content: '\e808'; }
+  .morea .icon-flow-parallel:before {
+    content: '\e809'; }
+  .morea .icon-ok:before {
+    content: '\e80a'; }
+  .morea .icon-cancel:before {
+    content: '\e80b'; }
+  .morea .icon-plus:before {
+    content: '\e80c'; }
+  .morea .icon-minus:before {
+    content: '\e80d'; }
+  .morea .icon-check:before {
+    content: '\e80e'; }
+  .morea .icon-lock-filled:before {
+    content: '\e80f'; }
+  .morea .icon-lock-open-filled:before {
+    content: '\e810'; }
+  .morea .icon-pin:before {
+    content: '\e811'; }
   .morea *[lang="grc"] {
     font-family: Cambria, Serif;
     letter-spacing: 1px; }
