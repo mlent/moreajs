@@ -83,15 +83,15 @@ define(function() {
 	 * Clicking a node allows you to edit the links it has.
 	 */
 	morea.prototype.editNode = function(e) {
-		this.unfocusNodes();
+		//this.unfocusNodes();
 		var wordNodes = this.el.querySelectorAll('span');
 
 		// If they're already , modify links (add/remove) 
 		if (this.el.className.indexOf('editing') !== -1) {
 			if (e.toElement.className.indexOf('linked') !== -1)
-				this.createLink(e);
-			else
 				this.removeLink(e);
+			else
+				this.createLink(e);
 
 			return;
 		}
@@ -114,14 +114,23 @@ define(function() {
 	morea.prototype.stopEditing = function(e) {
 		e.preventDefault();
 		this.unfocusNodes();
+
+		var wordNodes = this.el.querySelectorAll('span');
+
+		for (var i = 0; i < wordNodes.length; i++) {
+			wordNodes[i].removeClass('linked');
+			wordNodes[i].removeClass('selected');
+		}
+
 		this.el.removeClass('editing');
 	};
 
 	morea.prototype.createLink = function(e) {
 		console.log("create link");
 		e.toElement.addClass('linked');
+		e.toElement.addClass('hovered');
 
-		// Update our internal data structure
+		/* Update our internal data structure
 		var targetCTS = e.toElement.dataset.cts;
 		var links = this.el.querySelectorAll('.linked').map(function(node) {
 			return node.dataset.cts;
@@ -135,7 +144,7 @@ define(function() {
 		console.log("words that should all be connected", words);
 		
 		// Update UI
-		var sentenceNodes = this.el.querySelectorAll('.sentence');
+		var sentenceNodes = this.el.querySelectorAll('.sentence');*/
 
 	};
 
@@ -148,8 +157,8 @@ define(function() {
 	}
 
 	morea.prototype.removeLink = function(e) {
-		console.log("remove link");
 		e.toElement.removeClass('linked');
+		e.toElement.removeClass('hovered');
 
 		// Update our internal data structure
 
@@ -160,8 +169,9 @@ define(function() {
 		
 		var wordNodes = this.el.querySelectorAll('span');
 
-		for (var i = 0; i < wordNodes.length; i++)
+		for (var i = 0; i < wordNodes.length; i++) {
 			wordNodes[i].removeClass('hovered');
+		}
 	};
 
 	morea.prototype._getAllRelatedAlignments = function(translations) {

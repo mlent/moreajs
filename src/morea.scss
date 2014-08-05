@@ -285,6 +285,7 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 			}
 		}
 
+		/* Close button */
 		a {
 			display: inline-block;
 			position: absolute;
@@ -292,7 +293,7 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 			right: 0;
 			text-decoration: none;
 			color: #FFF;
-			background-color: #1FADAD;
+			background-color: #666;
 			height: 10px;
 			padding: 3px 5px;
 			font-size: 12px;

@@ -230,7 +230,8 @@
     padding: 5px 20px;
     box-sizing: border-box;
     position: relative;
-    line-height: 60px; }
+    line-height: 60px;
+    /* Close button */ }
     .morea .sentence:not(:last-child) {
       border-right: 1px solid #DDD; }
     .morea .sentence.rtl {
@@ -245,7 +246,7 @@
       right: 0;
       text-decoration: none;
       color: #FFF;
-      background-color: #1FADAD;
+      background-color: #666;
       height: 10px;
       padding: 3px 5px;
       font-size: 12px;
