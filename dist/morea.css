@@ -194,6 +194,7 @@
     background-color: #EEE;
     padding: 5px;
     overflow: auto;
+    min-height: 45px;
     width: 100%;
     box-sizing: border-box; }
     .morea .header a {
@@ -221,7 +222,8 @@
     .morea .header #btn-done:before {
       content: '\e800'; }
     .morea .header #btn-add-translation {
-      position: absolute; }
+      position: absolute;
+      right: 10px; }
   .morea .sentence {
     vertical-align: top;
     display: inline-block;

@@ -130,29 +130,41 @@ define(function() {
 		e.toElement.addClass('linked');
 		e.toElement.addClass('hovered');
 
-		/* Update our internal data structure
+		// Update our internal data structure
 		var targetCTS = e.toElement.dataset.cts;
-		var links = this.el.querySelectorAll('.linked').map(function(node) {
-			return node.dataset.cts;
-		});
+		var linkNodes = this.el.querySelectorAll('.linked');
+
+		// Extract just the CTS properties of all links
+		var links = [];
+		for (var i = 0, node; node = linkNodes[i]; i++)
+			links.push(node.dataset.cts);
+			
+		// Update the translations in our actual data
 		var words = [].concat.apply([], this.data.map(function(sentence) {
 			return sentence.words;
-		})).filter(function(word) {
-			return this._anyMatchInArray(links, word.CTS);
+		}));
+		var newWord = words.filter(function(word) {
+			return word.CTS === targetCTS;
+		})[0];
+		words.forEach(function(word, i) {
+			if (links.indexOf(word.CTS) !== -1) {
+
+				// TODO: When API supports it, switch this to include author consideration
+				// If the new Word is primary source, add it to secondary sources
+				// If word is secondary source, add it to primary source
+
+				console.log("found data for ", word);
+				console.log("add " + newWord.value + " as a translation for " + word.value); 
+			}
 		});
 		
-		console.log("words that should all be connected", words);
-		
-		// Update UI
-		var sentenceNodes = this.el.querySelectorAll('.sentence');*/
+	};
+
+	morea.prototype.insertTranslation = function(newWord, word) {
 
 	};
 
-	morea.prototype.insertTranslation = function(words, link) {
-
-	};
-
-	morea.prototype.removeTranslation = function(word, translationLinks) {
+	morea.prototype.removeTranslation = function(newWord, word) {
 
 	}
 
