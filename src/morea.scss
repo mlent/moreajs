@@ -1,3 +1,14 @@
+@font-face {
+	font-family: 'font';
+	src: url('../dist/fonts/font.eot?22347261');
+	src: url('../dist/fonts/font.eot?22347261#iefix') format('embedded-opentype'),
+	url('../dist/fonts/font.woff?22347261') format('woff'),
+	url('../dist/fonts/font.ttf?22347261') format('truetype'),
+	url('../dist/fonts/font.svg?22347261#font') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
 $greek-font: Cambria, Serif;
 $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif; 
 
@@ -90,16 +101,6 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 		}
 	}
 
-	@font-face {
-		font-family: 'font';
-		src: url('../font/font.eot?22347261');
-		src: url('../font/font.eot?22347261#iefix') format('embedded-opentype'),
-		url('../font/font.woff?22347261') format('woff'),
-		url('../font/font.ttf?22347261') format('truetype'),
-		url('../font/font.svg?22347261#font') format('svg');
-		font-weight: normal;
-		font-style: normal;
-	}
 
 	[class^="icon-"]:before, [class*=" icon-"]:before {
 		font-family: "font";
@@ -140,6 +141,29 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 	*[lang="grc"] {
 		font-family: $greek-font;
 		letter-spacing: 1px;
+	}
+
+	&.editing {
+
+		.btn-container {
+			display: block !important;
+		}
+		span {
+			&.selected {
+				background-color: #FFCB7C !important; 
+			}
+
+			/* Unaligned, new link */
+			&[data-tooltip]:after {
+				content: '\e80c';
+				color: #FFF;
+				background-color: #5CB85C !important;
+			}
+			&:hover {
+				color: #FFF;
+				background-color: #5CB85C !important;
+			}
+		}
 	}
 
 	form {
@@ -185,31 +209,68 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 			margin: 5px;
 			display: block;
 		}
-		
 	}
 
 	.header {
 		display: block;
 		background-color: #EEE;
-		padding: 10px;
+		padding: 5px;
 		overflow: auto;
 		width: 100%;
 		box-sizing: border-box;
 
 		a {
-			color: #1FADAD;
 			text-decoration: none;
-			float: right;
+		}
+		.btn-container {
+			text-align: center;
+			display: none;
+		}
+		.btn {
+			background-color: #333;
+			color: #FFF;
+			display: inline-block;
+			padding: 5px;
+			font-size: 12px;
+			margin: 5px;
+			line-height: 14px;
+			border-radius: 2px;
+
+			&:before {
+				font-family: 'font';
+				display: block;
+				text-align: center;
+			}
+		}
+		#btn-merge {
+			&:before {
+				content: '\e806';
+			}
+		}
+		#btn-edit {
+			&:before {
+				content: '\e805';
+			}
+		}
+		#btn-done {
+			&:before {
+				content: '\e800';
+			}
+		}
+		#btn-add-translation {
+			position: absolute;
 		}
 	}
 
 	.sentence {
+		vertical-align: top;
 		display: inline-block;
 		width: 33%;
 		min-width: 200px;
 		padding: 5px 20px;
 		box-sizing: border-box;
 		position: relative;
+		line-height: 60px;
 
 		&:not(:last-child) {
 			border-right: 1px solid #DDD;
@@ -244,30 +305,16 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 			}
 		}
 
-		&.editing {
-			span {
-				&.selected {
-					background-color: #FFCB7C !important; 
-				}
-
-				/* Unaligned, new link */
-				&:hover {
-					background-color: #9AE738;
-				}
-			}
-		}
-
-
 		span {
 			padding: 5px;
 
 			&:hover {
-				background-color: #F8D3A7 !important;
+				background-color: #F8D3A7;
 				cursor: pointer;
 			}
 
 			&.hovered {
-				background-color: #FCEBD6 !important;
+				background-color: #FCEBD6;
 			}
 
 			&.aligned {
@@ -281,9 +328,48 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 				/* Already aligned, de-link*/
 				&:hover {
 					color: #FFF;
-					background-color: #F00 !important;
+					background-color: #D15241 !important;
+				}
+				
+				&[data-tooltip]:after {
+					content: '\e80d';
+					color: #FFF;
+					background-color: #D15241 !important;
 				}
 			}
 		}
+	}
+
+
+	span[data-tooltip] {
+		position: relative;
+		text-decoration: none;
+	}
+	span[data-tooltip]:after {
+		font-family: 'font';
+		direction: ltr;
+		position: absolute;
+		top: -25px;
+		left: 50%;
+		margin-left: -13px;
+		padding: 0px 8px 0px 8px;
+		-webkit-border-radius: 50px;
+		-moz-border-radius   : 50px;
+		border-radius        : 50px;
+		white-space: nowrap;
+		opacity: 0;
+		font-size: 8px;
+		height: 20px;
+		width: 6px;
+		line-height: 20px;
+		/* At time of this creation, only Fx4 doing pseduo transitions */
+		-webkit-transition: all 0.4s ease;
+		-moz-transition   : all 0.4s ease;
+	}
+	span[data-tooltip]:hover:after {
+		bottom: 100%;
+	}
+	span[data-tooltip]:hover:after, a[data-tooltip]:hover:before {
+		opacity: 1;
 	}
 }

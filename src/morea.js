@@ -62,11 +62,11 @@ define(function() {
 		return out;
 	};
 
+	/**
+	 * Hovering over a node shows all the current links.
+	 */
 	morea.prototype.focusNode = function(e) {
 
-
-		// Otherwise, show display hover status
-		
 		var translations = e.toElement.dataset.translations.split(",");
 		var wordNodes = this.el.querySelectorAll('span');
 
@@ -79,23 +79,15 @@ define(function() {
 
 	};
 
+	/**
+	 * Clicking a node allows you to edit the links it has.
+	 */
 	morea.prototype.editNode = function(e) {
 		this.unfocusNodes();
 		var wordNodes = this.el.querySelectorAll('span');
 
-		// Select this node, make appropriate nodes editable
-		if (e.toElement.className.indexOf('selected') !== -1) {
-			e.toElement.removeClass('selected');
-			e.toElement.parentElement.removeClass('editing');
-
-			for (var i = 0; i < wordNodes.length; i++) {
-				wordNodes[i].removeClass('linked');
-			}
-			return;
-		}
-
-		// If this word is already aligned, display editing functionality
-		if (e.toElement.parentElement.className.indexOf('editing') !== -1) {
+		// If they're already , modify links (add/remove) 
+		if (this.el.className.indexOf('editing') !== -1) {
 			if (e.toElement.className.indexOf('linked') !== -1)
 				this.createLink(e);
 			else
@@ -104,22 +96,25 @@ define(function() {
 			return;
 		}
 
-		// Otherwise, "intialize" editing environment
+		// Otherwise, "intialize" editing environment -- put el in edit mode, highlight existing links
 		e.toElement.addClass('selected');
-		var sentenceNodes = this.el.querySelectorAll('.sentence');
 		var translations = e.toElement.dataset.translations.split(",");
 		var matches = this._getAllRelatedAlignments(translations);
 
-		// Skip first sentence, which is Original Version
-		for (var i = 1; i < sentenceNodes.length; i++) {
-			sentenceNodes[i].addClass('editing');
-		}
+		this.el.addClass('editing');
 
-		// Assign all currently linked to "linked"
 		for (var i = 0; i < wordNodes.length; i++) {
-			if (matches.indexOf(wordNodes[i].dataset.cts) !== -1) 
+			if (matches.indexOf(wordNodes[i].dataset.cts) !== -1) { 
 				wordNodes[i].addClass('linked');
+			}
+			wordNodes[i].setAttribute('data-tooltip', '');
 		}
+	};
+
+	morea.prototype.stopEditing = function(e) {
+		e.preventDefault();
+		this.unfocusNodes();
+		this.el.removeClass('editing');
 	};
 
 	morea.prototype.createLink = function(e) {
@@ -336,24 +331,62 @@ define(function() {
 		this.render();
 	};
 
-	morea.prototype.render = function(e) {
-		
-		if (this.el.className.indexOf('morea') === -1)
-			this.el.className += ' morea';
-
-		this.el.innerHTML = '';
+	morea.prototype._renderHeader = function() {
 
 		// Add header
 		this.header = document.createElement('div');
 		this.header.className = 'header';
 
-		var addLink = document.createElement('a');
-		addLink.innerHTML = 'Add Translation';
-		addLink.setAttribute('href', '#');
-		addLink.addEventListener('click', this.toggleForm.bind(this));
+		// Add Translation Link
+		var btnAddTrans = document.createElement('a');
+		btnAddTrans.innerHTML = 'Add Translation';
+		btnAddTrans.className = 'btn';
+		btnAddTrans.setAttribute('id', 'btn-add-translation');
+		btnAddTrans.setAttribute('href', '#');
 
-		this.header.appendChild(addLink);
+		// Button container
+		var btnContainer = document.createElement('div');
+		btnContainer.className = 'btn-container';
+
+		// Add Buttons
+		var btnDone = document.createElement('a');
+		btnDone.innerHTML = 'Done';
+		btnDone.className = 'btn';
+		btnDone.setAttribute('id', 'btn-done');
+		btnDone.setAttribute('href', '#');
+
+		var btnEdit = document.createElement('a');
+		btnEdit.innerHTML = 'Edit';
+		btnEdit.className = 'btn';
+		btnEdit.setAttribute('id', 'btn-edit');
+		btnEdit.setAttribute('href', '#');
+
+		var btnMerge = document.createElement('a');
+		btnMerge.innerHTML = 'Merge';
+		btnMerge.className = 'btn';
+		btnMerge.setAttribute('id', 'btn-merge');
+		btnMerge.setAttribute('href', '#');
+
+		// Event Listeners
+		btnAddTrans.addEventListener('click', this.toggleForm.bind(this));
+		btnDone.addEventListener('click', this.stopEditing.bind(this));
+
+		// Editing Buttons
+		this.header.appendChild(btnAddTrans);
+		btnContainer.appendChild(btnDone);
+		//this.header.appendChild(btnEdit);
+		//this.header.appendChild(btnMerge);
+		this.header.appendChild(btnContainer);
 		this.el.appendChild(this.header);
+	};
+
+	morea.prototype.render = function(e) {
+		
+		if (this.el.className.indexOf('morea') === -1)
+			this.el.addClass('morea');
+
+		this.el.innerHTML = '';
+		this._renderHeader();	
 
 		// For each sentence, add words inside a subcontainer
 		for (var i = 0; i < this.data.length; i++) {

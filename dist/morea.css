@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'font';
+  src: url("../dist/fonts/font.eot?22347261");
+  src: url("../dist/fonts/font.eot?22347261#iefix") format("embedded-opentype"), url("../dist/fonts/font.woff?22347261") format("woff"), url("../dist/fonts/font.ttf?22347261") format("truetype"), url("../dist/fonts/font.svg?22347261#font") format("svg");
+  font-weight: normal;
+  font-style: normal; }
+
 .morea {
   font-family: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   line-height: 36px;
@@ -65,13 +72,6 @@
       -o-transform: rotate(359deg);
       -webkit-transform: rotate(359deg);
       transform: rotate(359deg); } }
-
-  @font-face {
-    font-family: 'font';
-    src: url("../font/font.eot?22347261");
-    src: url("../font/font.eot?22347261#iefix") format("embedded-opentype"), url("../font/font.woff?22347261") format("woff"), url("../font/font.ttf?22347261") format("truetype"), url("../font/font.svg?22347261#font") format("svg");
-    font-weight: normal;
-    font-style: normal; }
 
   /* '' */
   /* '' */
@@ -144,6 +144,19 @@
   .morea *[lang="grc"] {
     font-family: Cambria, Serif;
     letter-spacing: 1px; }
+  .morea.editing .btn-container {
+    display: block !important; }
+  .morea.editing span {
+    /* Unaligned, new link */ }
+    .morea.editing span.selected {
+      background-color: #FFCB7C !important; }
+    .morea.editing span[data-tooltip]:after {
+      content: '\e80c';
+      color: #FFF;
+      background-color: #5CB85C !important; }
+    .morea.editing span:hover {
+      color: #FFF;
+      background-color: #5CB85C !important; }
   .morea form {
     display: none; }
     .morea form.open {
@@ -179,21 +192,45 @@
   .morea .header {
     display: block;
     background-color: #EEE;
-    padding: 10px;
+    padding: 5px;
     overflow: auto;
     width: 100%;
     box-sizing: border-box; }
     .morea .header a {
-      color: #1FADAD;
-      text-decoration: none;
-      float: right; }
+      text-decoration: none; }
+    .morea .header .btn-container {
+      text-align: center;
+      display: none; }
+    .morea .header .btn {
+      background-color: #333;
+      color: #FFF;
+      display: inline-block;
+      padding: 5px;
+      font-size: 12px;
+      margin: 5px;
+      line-height: 14px;
+      border-radius: 2px; }
+      .morea .header .btn:before {
+        font-family: 'font';
+        display: block;
+        text-align: center; }
+    .morea .header #btn-merge:before {
+      content: '\e806'; }
+    .morea .header #btn-edit:before {
+      content: '\e805'; }
+    .morea .header #btn-done:before {
+      content: '\e800'; }
+    .morea .header #btn-add-translation {
+      position: absolute; }
   .morea .sentence {
+    vertical-align: top;
     display: inline-block;
     width: 33%;
     min-width: 200px;
     padding: 5px 20px;
     box-sizing: border-box;
-    position: relative; }
+    position: relative;
+    line-height: 60px; }
     .morea .sentence:not(:last-child) {
       border-right: 1px solid #DDD; }
     .morea .sentence.rtl {
@@ -217,19 +254,13 @@
       margin: 10px; }
       .morea .sentence a:hover {
         background-color: #D15241; }
-    .morea .sentence.editing span {
-      /* Unaligned, new link */ }
-      .morea .sentence.editing span.selected {
-        background-color: #FFCB7C !important; }
-      .morea .sentence.editing span:hover {
-        background-color: #9AE738; }
     .morea .sentence span {
       padding: 5px; }
       .morea .sentence span:hover {
-        background-color: #F8D3A7 !important;
+        background-color: #F8D3A7;
         cursor: pointer; }
       .morea .sentence span.hovered {
-        background-color: #FCEBD6 !important; }
+        background-color: #FCEBD6; }
       .morea .sentence span.aligned {
         border-bottom: 2px solid #DDD; }
       .morea .sentence span.linked {
@@ -237,4 +268,35 @@
         /* Already aligned, de-link*/ }
         .morea .sentence span.linked:hover {
           color: #FFF;
-          background-color: #F00 !important; }
+          background-color: #D15241 !important; }
+        .morea .sentence span.linked[data-tooltip]:after {
+          content: '\e80d';
+          color: #FFF;
+          background-color: #D15241 !important; }
+  .morea span[data-tooltip] {
+    position: relative;
+    text-decoration: none; }
+  .morea span[data-tooltip]:after {
+    font-family: 'font';
+    direction: ltr;
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    margin-left: -13px;
+    padding: 0px 8px 0px 8px;
+    -webkit-border-radius: 50px;
+    -moz-border-radius: 50px;
+    border-radius: 50px;
+    white-space: nowrap;
+    opacity: 0;
+    font-size: 8px;
+    height: 20px;
+    width: 6px;
+    line-height: 20px;
+    /* At time of this creation, only Fx4 doing pseduo transitions */
+    -webkit-transition: all 0.4s ease;
+    -moz-transition: all 0.4s ease; }
+  .morea span[data-tooltip]:hover:after {
+    bottom: 100%; }
+  .morea span[data-tooltip]:hover:after, .morea a[data-tooltip]:hover:before {
+    opacity: 1; }
