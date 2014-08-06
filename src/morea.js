@@ -40,6 +40,15 @@ define(function() {
 	morea.prototype.init = function() {
 		this.config = this._extend({}, this.defaults, this.options);
 		this.data = this.config.data || this._fetchData(this.config.dataUrl);
+
+		// Testing purposes:
+		this.data.forEach(function(sentObj) {
+			var words = sentObj.words;
+
+			for (var i = 0, word; word = words[i]; i++)
+				word.translations = [];
+		});
+
 		this.render();
 	};
 
@@ -132,10 +141,11 @@ define(function() {
 
 		// Update our internal data structure
 		var targetCTS = e.toElement.dataset.cts;
-		var linkNodes = this.el.querySelectorAll('.linked');
+		var linkNodes = Array.prototype.slice.call(this.el.querySelectorAll('.linked'));
+		linkNodes = linkNodes.concat(Array.prototype.slice.call(this.el.querySelectorAll('.selected')));
 
 		// Extract just the CTS properties of all links
-		var links = [];
+		var links = [], that = this;
 		for (var i = 0, node; node = linkNodes[i]; i++)
 			links.push(node.dataset.cts);
 			
@@ -146,35 +156,97 @@ define(function() {
 		var newWord = words.filter(function(word) {
 			return word.CTS === targetCTS;
 		})[0];
-		words.forEach(function(word, i) {
-			if (links.indexOf(word.CTS) !== -1) {
+		this.data.forEach(function(sentObj, i) {
+			var words = sentObj.words;
 
-				// TODO: When API supports it, switch this to include author consideration
-				// If the new Word is primary source, add it to secondary sources
-				// If word is secondary source, add it to primary source
+			for (var i = 0, word; word = words[i]; i++) {
+				if (links.indexOf(word.CTS) !== -1 && newWord.lang !== word.lang)  {
+					var oneDir = (word.translations.filter(function(item) {
+						return item.CTS === newWord.CTS;
+					}).length !== 0);
 
-				console.log("found data for ", word);
-				console.log("add " + newWord.value + " as a translation for " + word.value); 
+					var otherDir = (newWord.translations.filter(function(item) {
+						return item.CTS === word.CTS;
+					}).length !== 0);
+
+					if (!oneDir) {
+						word.translations.push(newWord);
+
+						var el = that.el.querySelector('span[data-cts="' + word.CTS + '"]');
+						var trans = el.dataset.translations.split(",");
+						trans.push(newWord.CTS);
+						el.setAttribute('data-translations', trans.join());
+
+						console.log("added " + newWord.value + " as translation for " + word.value);
+					}
+					if (!otherDir) {
+						newWord.translations.push(word);
+
+						var el = that.el.querySelector('span[data-cts="' + newWord.CTS + '"]');
+						var trans = el.dataset.translations.split(",");
+						trans.push(word.CTS);
+						el.setAttribute('data-translations', trans.join());
+
+						console.log("added " + word.value + " as translation for " + newWord.value);
+					}
+				}
 			}
 		});
-		
 	};
-
-	morea.prototype.insertTranslation = function(newWord, word) {
-
-	};
-
-	morea.prototype.removeTranslation = function(newWord, word) {
-
-	}
 
 	morea.prototype.removeLink = function(e) {
 		e.toElement.removeClass('linked');
 		e.toElement.removeClass('hovered');
 
 		// Update our internal data structure
+		var targetCTS = e.toElement.dataset.cts;
+		var linkNodes = Array.prototype.slice.call(this.el.querySelectorAll('.linked'));
+		linkNodes = linkNodes.concat(Array.prototype.slice.call(this.el.querySelectorAll('.selected')));
 
-		// Update the element's data-translations field
+		// Extract just the CTS properties of all links
+		var links = [], that = this;
+		for (var i = 0, node; node = linkNodes[i]; i++)
+			links.push(node.dataset.cts);
+			
+		// Update the translations in our actual data
+		var words = [].concat.apply([], this.data.map(function(sentence) {
+			return sentence.words;
+		}));
+		var newWord = words.filter(function(word) {
+			return word.CTS === targetCTS;
+		})[0];
+		this.data.forEach(function(sentObj, i) {
+			var words = sentObj.words;
+
+			for (var i = 0, word; word = words[i]; i++) {
+				if (links.indexOf(word.CTS) !== -1)  {
+
+					// Splice out our targetCTS from links
+					
+					word.translations = word.translations.filter(function(obj) {
+						return obj.CTS !== targetCTS;
+					});
+
+					newWord.translations = newWord.translations.filter(function(obj) {
+						return obj.CTS !== word.CTS;
+					});
+
+					var el = that.el.querySelector('span[data-cts="' + word.CTS + '"]');
+					var trans = el.dataset.translations.split(",");
+					trans.splice(trans.indexOf(newWord.CTS), 1);
+					el.setAttribute('data-translations', trans.join());
+
+					console.log("removed " + newWord.value + " as translation for " + word.value);
+
+					el = that.el.querySelector('span[data-cts="' + newWord.CTS + '"]');
+					trans = el.dataset.translations.split(",");
+					trans.splice(trans.indexOf(word.CTS), 1);
+					el.setAttribute('data-translations', trans.join());
+
+					console.log("removed " + word.value + " as translation for " + newWord.value);
+				}
+			}
+		});
 	};
 
 	morea.prototype.unfocusNodes = function(e) {
