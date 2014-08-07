@@ -137,7 +137,6 @@ define(function() {
 	};
 
 	morea.prototype.createLink = function(e) {
-		console.log("create link");
 		e.toElement.addClass('linked');
 		e.toElement.addClass('hovered');
 
@@ -148,23 +147,27 @@ define(function() {
 
 		// Extract just the CTS properties of all links
 		var links = [], that = this;
-		for (var i = 0, node; node = linkNodes[i]; i++)
+		for (var i = 0, node; node = linkNodes[i]; i++) {
 			links.push(node.dataset.cts);
+		}
 			
 		// Update the translations in our actual data
 		var words = [].concat.apply([], this.data.map(function(sentence) {
 			return sentence.words;
 		}));
-		var newWord = words.filter(function(word) {
-			return word.CTS === targetCTS;
-		})[0];
+
+		// newWords -- must also include the existing links of that word
+		var newWords = words.filter(function(word) {
+			return links.indexOf(word.CTS) !== -1;
+		});
+
 		this.data.forEach(function(sentObj, i) {
 			var words = sentObj.words;
 
 			for (var i = 0, word; word = words[i]; i++) {
-				if (links.indexOf(word.CTS) !== -1 && newWord.lang !== word.lang)  {
-					that.insertTranslation(word, newWord);
-					that.insertTranslation(newWord, word);
+				if (links.indexOf(word.CTS) !== -1)  {
+					that.insertTranslation(word, newWords);
+					that.insertTranslation(newWords, word);
 				}
 			}
 		});
@@ -172,25 +175,70 @@ define(function() {
 
 	/**
 	 * Insert source word as translation in dest.
-	 * @param {object} source - Word to be added into Dest's translation list.
-	 * @param {object} dest - Word to receive source as a translation.
+	 * @param {object} source - Word to be added into Dest's translation list. Can be object or array.
+	 * @param {object} dest - Word to receive source as a translation. Can be object or array.
 	 */
 	// TODO: Prevent beispielsweise Farsi from having English translations directly linked
 	morea.prototype.insertTranslation = function(source, dest) {
-		var isNew = (dest.translations.filter(function(word) {
-			return source.CTS == word.CTS;
-		}).length === 0);
+		var that = this, isNew;
 
-		if (!isNew) 
-			return;
+		// TODO: Find out if there is a better way to check for which is an array of objects. toString results in [obj Obj] in both cases.
+		// Means we are adding many translations to Dest
+		if (source[0] !== undefined) {
 
-		// Update data structure and DOM
-		dest.translations.push(source);
+			// Create list of CTS to check against
+			var links = source.map(function(obj) {
+				return obj.CTS;
+			});
+			isNew = (dest.translations.filter(function(word) {
+				return links.indexOf(word.CTS) !== -1;
+			}).length === 0);
 
-		var el = this.el.querySelector('span[data-cts="' + source.CTS + '"]');
-		var trans = el.dataset.translations.split(",");
-		trans.push(source.CTS);
-		el.setAttribute('data-translations', trans.join());
+			if (!isNew) return;
+
+			// Filter out links we don't want:
+			//	1. The language is the same (e.g. don't align greek to greek)
+			//	2. One of the languages isn't the primary source (e.g. don't align english to farsi)
+
+			source = source.filter(function(word) {
+				return word.lang !== dest.lang && (word.lang === 'grc' || dest.lang === 'grc');
+			});
+
+			// Update data structure
+			dest.translations = dest.translations.concat(source);
+
+			// Update DOM
+			var el = this.el.querySelector('span[data-cts="' + dest.CTS + '"]');
+			var trans = el.dataset.translations.split(",");
+			el.setAttribute('data-translations', trans.concat(links).join(","));
+			el.addClass('linked');
+		}
+
+		// Means we are adding source to many translations
+		if (dest[0] !== undefined) {
+
+			// Check each destination, whether source is already in its translations array
+			for (var i = 0; i < dest.length; i++) {
+				var isNew = (dest[i].translations.filter(function(word) {
+					return word.CTS === source.CTS;
+				}).length === 0);
+
+				if (!isNew) continue;
+
+				// Filter the destination out if it's the same language as source
+				if (dest[i].lang === source.lang || (source.lang !== 'grc' && dest[i].lang !== 'grc')) continue;
+
+				// Update data structure
+				dest[i].translations.push(source);
+
+				// Update DOM
+				var el = this.el.querySelector('span[data-cts="' + dest[i].CTS + '"]');
+				var trans = el.dataset.translations.split(",");
+				trans.push(source.CTS);
+				el.setAttribute('data-translations', trans.join(","));
+				el.addClass('linked');
+			}
+		}
 	};
 
 	morea.prototype.removeLink = function(e) {
@@ -234,12 +282,6 @@ define(function() {
 	 * @param {object} dest - Word to be removed from source as a translation.
 	 */
 	morea.prototype.removeTranslation = function(source, dest) {
-		var isNew = (dest.translations.filter(function(word) {
-			return source.CTS == word.CTS;
-		}).length === 0);
-
-		if (!isNew) 
-			return;
 
 		// Update data structure and DOM
 		dest.translations = dest.translations.filter(function(obj) {
@@ -586,7 +628,7 @@ define(function() {
 
 	if (!HTMLElement.prototype.addClass) {
 		HTMLElement.prototype.addClass = function(add) {
-			if (this.className.indexOf('add') === -1)
+			if (this.className.indexOf(add) === -1)
 				this.className += ' ' + add;
 
 			this.className.trim();
