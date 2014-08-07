@@ -29,8 +29,8 @@ define(function() {
 
 	morea.prototype.defaults = {
 		mode: 'edit',
-		data: null,					// Array of sentence objects
-		dataUrl: null,				// Or an endpoint + callback to process the data
+		data: [],						// Array of sentence objects
+		dataUrl: undefined,				// Or an endpoint + callback to process the data
 		orientation: 'horizontal'
 	};
 
@@ -39,7 +39,21 @@ define(function() {
 	 */
 	morea.prototype.init = function() {
 		this.config = this._extend({}, this.defaults, this.options);
-		this.data = this.config.data || this._fetchData(this.config.dataUrl);
+		this.render();
+
+		if (this.config.data.length !== 0)
+			this.data = this.config.data;
+		else {
+			this.data = [];
+			this._fetchData(this.config.dataUrl, function(responseText) {
+				this.data[0] = JSON.parse(responseText);
+				var langs = Object.keys(this.data[0].translations);
+
+				for (var i = 0; i < langs.length; i++)
+					this._fetchData(this.data[0].translations[langs[i]] + '?full=True');
+
+			}.bind(this));
+		}
 
 		if (this.config.mode === 'play') {
 			this.data.forEach(function(sentObj) {
@@ -49,27 +63,29 @@ define(function() {
 					word.translations = [];
 			});
 		}
-
-		this.render();
 	};
 
-	morea.prototype._fetchData = function(dataUrl) {
+	morea.prototype._fetchData = function(dataUrl, callback) {
 		var request = new XMLHttpRequest();
-		var out = {};
-		request.open('GET', dataUrl, false);
+		request.open('GET', dataUrl, true);
 
 		request.onload = function() {
 			if (request.status >= 200 && request.status < 400) {
-				// Use the user's defined callback
-				out = this.config.callback(request.responseText);
+
+				// Render this sentence
+				var sentence = JSON.parse(request.responseText);
+				this.data.push(sentence);
+				this.renderSentence(sentence);
+
+				// Perform callback if needed
+				if (callback)
+					callback(request.responseText);
 			}
 			else
 				console.log("");
 		}.bind(this);
 
 		request.send();
-		
-		return out;
 	};
 
 	/**
@@ -526,57 +542,66 @@ define(function() {
 
 		this.el.innerHTML = '';
 		this._renderHeader();	
-
-		// For each sentence, add words inside a subcontainer
-		for (var i = 0; i < this.data.length; i++) {
-			var el = document.createElement('div'), lang = '';
-			el.className = 'sentence';
-
-			// HACK, til we have lang attrs
-			if (this.data[i].CTS.indexOf('fas') !== -1)
-				lang = 'fas';
-			else if (this.data[i].CTS.indexOf('eng') !== -1)
-				lang = 'eng';
-			else
-				lang = 'grc';
-
-			if (lang === 'fas')
-				el.className += ' rtl';
-
-			if (lang !== 'grc') {
-				var x = document.createElement('a');
-				x.setAttribute('href', '#');
-				x.setAttribute('title', 'Close Translation');
-				x.innerHTML = '&times;';
-				el.appendChild(x);
-			}
-
-			for (var j = 0; j < this.data[i].words.length; j++) {
-				var word = document.createElement('span');
-				word.innerHTML = this.data[i].words[j].value;
-
-				var translations = this.data[i].words[j].translations.map(function(word) {
-					return word.CTS;
-				}).toString();
-
-				if (translations.length > 0)
-					word.className = 'aligned';
-
-				word.setAttribute('data-translations', translations);
-				word.setAttribute('data-cts', this.data[i].words[j].CTS);
-				word.setAttribute('lang', lang);
-
-				word.addEventListener("mouseover", this.focusNode.bind(this));
-				word.addEventListener("mouseout", this.unfocusNodes.bind(this));
-				word.addEventListener("click", this.editNode.bind(this));
-
-				el.appendChild(word);
-				el.appendChild(document.createTextNode(' '));
-			}
-
-			this.el.appendChild(el);
-		}
 	};
+
+	morea.prototype.renderSentence = function(sentence) {
+
+		var el, lang;
+		if (this.el.querySelector('[data-cts="' + sentence.CTS + '"]') === null) {
+			el = document.createElement('div');
+			el.className = 'sentence';
+			el.setAttribute('data-cts', sentence.CTS);
+		}
+		else {
+			el = this.el.querySelector('[data-cts="' + sentence.CTS + '"]');
+		}
+
+		// HACK, til we have lang attrs
+		if (sentence.CTS.indexOf('fas') !== -1)
+			lang = 'fas';
+		else if (sentence.CTS.indexOf('eng') !== -1)
+			lang = 'eng';
+		else
+			lang = 'grc';
+
+		if (lang === 'fas')
+			el.className += ' rtl';
+
+		el.innerHTML = '';
+
+		if (lang !== 'grc') {
+			var x = document.createElement('a');
+			x.setAttribute('href', '#');
+			x.setAttribute('title', 'Close Translation');
+			x.innerHTML = '&times;';
+			el.appendChild(x);
+		}
+
+		for (var j = 0; j < sentence.words.length; j++) {
+			var word = document.createElement('span');
+			word.innerHTML = sentence.words[j].value;
+
+			var translations = sentence.words[j].translations.map(function(word) {
+				return word.CTS;
+			}).toString();
+
+			if (translations.length > 0)
+				word.className = 'aligned';
+
+			word.setAttribute('data-translations', translations);
+			word.setAttribute('data-cts', sentence.words[j].CTS);
+			word.setAttribute('lang', lang);
+
+			word.addEventListener("mouseover", this.focusNode.bind(this));
+			word.addEventListener("mouseout", this.unfocusNodes.bind(this));
+			word.addEventListener("click", this.editNode.bind(this));
+
+			el.appendChild(word);
+			el.appendChild(document.createTextNode(' '));
+		}
+
+		this.el.appendChild(el);
+	}
 
 
 	// ------------------------- //
