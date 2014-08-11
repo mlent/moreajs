@@ -31,7 +31,8 @@ define(function() {
 		mode: 'edit',
 		data: [],						// Array of sentence objects
 		dataUrl: undefined,				// Or an endpoint + callback to process the data
-		orientation: 'horizontal'
+		orientation: 'horizontal',
+		user: 'tester'
 	};
 
 	/**
@@ -52,8 +53,15 @@ define(function() {
 				this.data[0] = JSON.parse(responseText);
 				var langs = Object.keys(this.data[0].translations);
 
-				for (var i = 0; i < langs.length; i++)
-					this._fetchData(this.data[0].translations[langs[i]] + '?full=True');
+				this.config.langs = this.data[0].translations;
+
+				/*
+				* Existing modes: create, play, edit. In all modes but create, we need existing translations.
+				*/
+				if (this.config.mode !== 'create') {
+					for (var i = 0; i < langs.length; i++)
+						this._fetchData(this.data[0].translations[langs[i]] + '?full=True');
+				}
 
 			}.bind(this));
 		}
@@ -383,17 +391,17 @@ define(function() {
 		var langs = [
 			{
 				"hr": "English",
-				"code": "eng",
+				"code": "en",
 				"dir": "ltr"
 			},
 			{
 				"hr": "Français",
-				"code": "fra",
+				"code": "fr",
 				"dir": "ltr"
 			},
 			{
 				"hr": "فارسی",
-				"code": "fas",
+				"code": "fa",
 				"dir": "rtl"
 			},
 			{
@@ -450,7 +458,6 @@ define(function() {
 		checkbox.setAttribute('type', 'checkbox');
 		checkbox.setAttribute('id', 'token-option');
 		checkbox.setAttribute('name', 'tokenize-punctuation');
-		checkbox.setAttribute('value', 'true');
 
 		tokenOption.appendChild(checkbox);
 		tokenOption.innerHTML += 'Split punctuation as tokens';
@@ -470,14 +477,29 @@ define(function() {
 		form.appendChild(btn);
 
 		this.header.appendChild(form);
+		this.header.querySelector('input[name="tokenize-punctuation"]').checked = true;
 	};
 
 	morea.prototype.addTranslation = function(e) {
 		e.preventDefault();
 
 		var form = this.header.querySelector('form');
-		var sentence = form.querySelector('textarea').value.split(" ");
+		var s = form.querySelector('textarea').value.trim();
+		
+		if (form.querySelector('input[name="tokenize-punctuation"]').checked) {
+			s = s.replace(/([\.,-\/#!$%\^&\*;:{}=\-_`~()])/g, " \$1");
+		}
+
+		var sentence = s.split(" ");
+
+		// Form the new CTS identifier
 		var lang = form.querySelector('select').value;
+		var subref = this._getCtsProperty(this.data[0].CTS, "work");
+		subref["translation"] = this.config.user + "-" + lang;
+		var newCTS = this._setCtsProperty(this.data[0].CTS, {
+			"work": subref 
+		});
+
 		var words = [];
 
 		for (var i = 0; i < sentence.length; i++) {
@@ -486,20 +508,21 @@ define(function() {
 				lang: lang,
 				length: sentence[i].length,
 				translations: [],
-				CTS: 'urn:cts:greekLit:tlg0003.tlg001.perseus-' + 'test' + /*lang*/ + ':1.89.1:' + (i + 1) 	// TODO: obviously replace
+				CTS: newCTS + ':' + (i + 1) 	// Setting word number 
 			});
 		}
 
 		var sentence = {
-			CTS: 'urn:cts:greekLit:tlg0003.tlg001.perseus-' + 'test' + /*lang*/ + ':1.89.1',
+			CTS: newCTS,
 			length: words.length,
 			sentence: form.querySelector('textarea').value.trim(),
 			translations: {},																	// TODO: obv. replace
+			lang: lang,
 			words: words
 		};
 
 		this.data.splice(1, 0, sentence);
-		this.render();
+		this.renderSentence(this.data[1]);
 	};
 
 	morea.prototype._renderHeader = function() {
@@ -660,6 +683,57 @@ define(function() {
 		else
 			el['on' + type] = handler;
 
+	};
+
+	morea.prototype._splitCts = function(CTS) {
+		/*	CTS example:	urn:	cts:	greekLit:	tlg0003.tlg001.perseus-grc:		1.89.1:		13
+							urn:	cts:	namespace:	work:							passage:	word
+		*/ 
+		var split = CTS.split(":");
+		var work = split[3].split(".");
+
+		var obj = {
+			"urn": split[0],
+			"cts": split[1],
+			"namespace": split[2],
+			"work": {
+				"textgroup": work[0],
+				"text": work[1],
+				"translation": work[2]
+			},
+			"sentence": split[4]
+		};
+
+		if (split.length === 6)
+			obj["word"] = split[5];
+
+		return obj;
+	};
+
+	morea.prototype._getCtsProperty = function(CTS, property) {
+		var newCTS = this._splitCts(CTS);
+		return newCTS[property];
+	};
+
+	morea.prototype._setCtsProperty = function(CTS, propertyList) {
+		var c = this._splitCts(CTS);
+	
+		for (var key in propertyList) {
+			if (propertyList.hasOwnProperty(key)) {
+				c[key] = propertyList[key];
+			}
+		}
+		var work = Object.keys(c.work).map(function(k) {
+			return c.work[k];
+		});
+
+		// TODO: Replace
+		var updatedCTS = c.urn + ":" + c.cts + ":" + c.namespace + ":" + work.join(".") + ":" + c.sentence;
+
+		if (c.word)
+			updatedCTS += ":" + c.word;
+
+		return updatedCTS;
 	};
 
 	if (!HTMLElement.prototype.removeClass) {

@@ -224,6 +224,12 @@
     .morea .header #btn-add-translation {
       position: absolute;
       right: 10px; }
+  .morea.horizontal .sentence {
+    display: block !important;
+    width: 100% !important;
+    border-left: 1px dotted #EEE;
+    border-bottom: 1px dotted #EEE;
+    border-right: 1px dotted #EEE !important; }
   .morea .sentence {
     vertical-align: top;
     display: inline-block;
@@ -234,12 +240,6 @@
     position: relative;
     line-height: 60px;
     /* Close button */ }
-    .morea .sentence.horizontal {
-      display: block !important;
-      width: 100% !important;
-      border-left: 1px dotted #EEE;
-      border-bottom: 1px dotted #EEE;
-      border-right: 1px dotted #EEE !important; }
     .morea .sentence:first-child {
       border-left: 1px dotted #DDD; }
     .morea .sentence:not(:last-child) {

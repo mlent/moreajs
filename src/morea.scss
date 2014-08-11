@@ -265,17 +265,19 @@ $bookmark-color: #5E74A5;
 		}
 	}
 
-	.sentence {
-		
-		$left: 20px;
-
-		&.horizontal {
+	&.horizontal {
+		.sentence {
 			display: block !important;
 			width: 100% !important;
 			border-left: 1px dotted #EEE;
 			border-bottom: 1px dotted #EEE;
 			border-right: 1px dotted #EEE !important;
 		}
+	}
+
+	.sentence {
+		
+		$left: 20px;
 
 		vertical-align: top;
 		display: inline-block;

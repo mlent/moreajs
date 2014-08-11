@@ -13,7 +13,7 @@ requirejs.config({
 require(['morea'], function(Morea) {
 
 	new Morea('div', { 
-		mode: 'edit',
+		mode: 'create',
 		dataUrl: 'http://139.18.40.154:8000/api/v1/sentence/4/?full=True',
 		targetLang: ['eng']
 	});
