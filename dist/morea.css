@@ -234,6 +234,12 @@
     position: relative;
     line-height: 60px;
     /* Close button */ }
+    .morea .sentence.horizontal {
+      display: block !important;
+      width: 100% !important;
+      border-left: 1px dotted #EEE;
+      border-bottom: 1px dotted #EEE;
+      border-right: 1px dotted #EEE !important; }
     .morea .sentence:first-child {
       border-left: 1px dotted #DDD; }
     .morea .sentence:not(:last-child) {

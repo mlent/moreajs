@@ -39,6 +39,9 @@ define(function() {
 	 */
 	morea.prototype.init = function() {
 		this.config = this._extend({}, this.defaults, this.options);
+		
+		this._addEvent(window, "resize", this._toggleOrientation.bind(this));
+
 		this.render();
 
 		if (this.config.data.length !== 0)
@@ -364,6 +367,13 @@ define(function() {
 		}
 	};
 
+	morea.prototype._toggleOrientation = function(e) {
+		if (this.el.offsetWidth < 1000)
+			this.el.addClass('horizontal')
+		else
+			this.el.removeClass('horizontal');
+	};
+
 	morea.prototype._renderForm = function(e) {
 		var form = document.createElement('form');
 		var langSelector = document.createElement('select');
@@ -637,6 +647,19 @@ define(function() {
 		}
 
 		return found;
+	};
+
+	morea.prototype._addEvent = function(el, type, handler) {
+		if (el === null || typeof(el) === 'undefined') 
+			return;
+
+		if (el.addEventListener)
+			el.addEventListener(type, handler, false);
+		else if (el.attachEvent)
+			el.attachEvent('on' + type, handler);
+		else
+			el['on' + type] = handler;
+
 	};
 
 	if (!HTMLElement.prototype.removeClass) {

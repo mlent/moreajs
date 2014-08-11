@@ -269,6 +269,14 @@ $bookmark-color: #5E74A5;
 		
 		$left: 20px;
 
+		&.horizontal {
+			display: block !important;
+			width: 100% !important;
+			border-left: 1px dotted #EEE;
+			border-bottom: 1px dotted #EEE;
+			border-right: 1px dotted #EEE !important;
+		}
+
 		vertical-align: top;
 		display: inline-block;
 		width: 25%;
