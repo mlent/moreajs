@@ -60,8 +60,25 @@ define(function() {
 			this._fetchData(this.config.dataUrl, function(responseText) {
 				this.data[0] = JSON.parse(responseText);
 				var langs = Object.keys(this.data[0].translations);
+				var that = this;
 
-				this.config.langs = this.data[0].translations;
+				// TODO: replace all this gnarly code, when we have lang at doc level. Should come in to us as a config.
+				// This config setting should be set by some translation engine outside of this plugin
+				this.config.langs = langs.reduce(function(map, el) { 
+					var eng = { "fr": "French", "en": "English", "fa": "Farsi", "hr": "Croatian"};
+					map[el] = {
+						"hr": eng[el],
+						"dir": (el === 'fa') ? 'rtl' : 'ltr',
+						"resource_uri": that.data[0].translations[el] 
+					};
+					return map;
+				}, {});
+				// Need to deal with localization outside of this code, at application level
+				this.config.langs[this.data[0].words[0].lang] = {
+					"hr": "Greek",
+					"resource_uri": this.data[0].resource_uri,
+					"dir": "ltr"
+				};
 
 				// Erase unneeded alignment data from original sentence
 				if (this.config.mode !== 'edit') {
@@ -70,9 +87,10 @@ define(function() {
 					});
 				}
 
+				// Only fetch existing alignments if we're going to use them
 				if (this.config.mode !== 'create') {
 					for (var i = 0; i < langs.length; i++) {
-						var url = this.data[0].translations[langs[i]] + '?full=True';
+						var url = this.config.langs[langs[i]].resource_uri + '?full=True';
 						this._fetchData(url);
 					}
 				}
@@ -101,11 +119,13 @@ define(function() {
 				}
 
 				this.data.push(sentence);
-				this.renderSentence(sentence);
 
 				// Perform callback if needed
 				if (callback)
 					callback(request.responseText);
+
+				this.renderSentence(sentence);
+
 			}
 			else
 				console.log("");
@@ -136,6 +156,10 @@ define(function() {
 	 */
 	morea.prototype.editNode = function(e) {
 		var wordNodes = this.el.querySelectorAll('span');
+
+		// Close Form if it's open
+		if (this.header.querySelector('form.open') !== null)
+			this.toggleForm();
 
 		// If they're already , modify links (add/remove) 
 		if (this.el.className.indexOf('editing') !== -1) {
@@ -407,69 +431,18 @@ define(function() {
 		var langSelector = document.createElement('select');
 		langSelector.setAttribute('name', 'lang');
 
-		// TODO: make this external setting, not hardcoded
-		var langs = [
-			{
-				"hr": "English",
-				"code": "en",
-				"dir": "ltr"
-			},
-			{
-				"hr": "Français",
-				"code": "fr",
-				"dir": "ltr"
-			},
-			{
-				"hr": "فارسی",
-				"code": "fa",
-				"dir": "rtl"
-			},
-			{
-				"hr": "Hrvatski",
-				"code": "hr",
-				"dir": "ltr"
-			}
-		];
-
 		var opt = document.createElement('option');
 		opt.innerHTML = 'Select Language';
 
+		var langs = Object.keys(this.config.langs).sort();
 		for (var i = 0; i < langs.length; i++) {
 			var option = document.createElement('option');
-			option.setAttribute('value', langs[i].code);
-			option.innerHTML = langs[i].hr;
-			option.setAttribute('data-text-direction', langs[i].dir);
+			option.setAttribute('value', langs[i]);
+			option.innerHTML = this.config.langs[langs[i]].hr;
 			langSelector.appendChild(option);
 		}
 
 		var textBox = document.createElement('textarea');
-
-		var textDirLabel = document.createElement('label');
-		textDirLabel.innerHTML = 'Text Direction: '; 
-
-		var ltrRadio = document.createElement('input');
-		ltrRadio.setAttribute('type', 'radio');
-		ltrRadio.setAttribute('name', 'textdirection');
-		ltrRadio.setAttribute('value', 'ltr');
-		ltrRadio.setAttribute('id', 'ltr-radio');
-
-		var ltrRadioLabel = document.createElement('label');
-		ltrRadioLabel.setAttribute('for', 'ltr-radio');
-
-		ltrRadioLabel.appendChild(ltrRadio);
-		ltrRadioLabel.innerHTML += 'Left to Right';
-
-		var rtlRadio = document.createElement('input');
-		rtlRadio.setAttribute('type', 'radio');
-		rtlRadio.setAttribute('name', 'textdirection');
-		rtlRadio.setAttribute('value', 'rtl');
-		rtlRadio.setAttribute('id', 'rtl-radio');
-
-		var rtlRadioLabel = document.createElement('label');
-		rtlRadioLabel.setAttribute('for', 'rtl-radio');
-
-		rtlRadioLabel.appendChild(rtlRadio);
-		rtlRadioLabel.innerHTML += 'Right to Left';
 
 		var tokenOption = document.createElement('label');
 		tokenOption.setAttribute('for', 'token-option');
@@ -490,9 +463,6 @@ define(function() {
 
 		form.appendChild(textBox);
 		form.appendChild(langSelector);
-		form.appendChild(textDirLabel);
-		form.appendChild(ltrRadioLabel);
-		form.appendChild(rtlRadioLabel);
 		form.appendChild(tokenOption);
 		form.appendChild(btn);
 
@@ -631,8 +601,8 @@ define(function() {
 		}
 
 		// TODO: Get this out of hardcoding to support all RTL langs
-		if (sentence.lang === 'fas')
-			el.className += ' rtl';
+		if (this.config.langs[sentence.lang].dir === 'rtl')
+			el.addClass('rtl');
 
 		el.innerHTML = '';
 
