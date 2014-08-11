@@ -190,7 +190,8 @@ define(function() {
 		// Extract just the CTS properties of all links
 		var links = [], that = this;
 		for (var i = 0, node; node = linkNodes[i]; i++) {
-			links.push(node.dataset.cts);
+			if (links.indexOf(node.dataset.cts) === -1)
+				links.push(node.dataset.cts);
 		}
 			
 		// Update the translations in our actual data
@@ -245,6 +246,10 @@ define(function() {
 			source = source.filter(function(word) {
 				return word.lang !== dest.lang && (word.lang === 'grc' || dest.lang === 'grc');
 			});
+
+			// Return if no words fit criteria
+			if (source.length === 0)
+				return;
 
 			// Update data structure
 			dest.translations = dest.translations.concat(source);
@@ -520,6 +525,14 @@ define(function() {
 			"work": subref 
 		});
 
+		// Users may only work on individual languages, to avoid confusing document references.
+		// Could change in the future, but adds unnecessary complexity now.
+		if (this.el.querySelector('[data-cts="' + newCTS + '"]') !== null) {
+			alert("You are already working on this language. Click 'Edit' to modify it.");
+			return;
+		}
+
+
 		var words = [];
 
 		for (var i = 0; i < sentence.length; i++) {
@@ -616,10 +629,6 @@ define(function() {
 			el.setAttribute('data-cts', sentence.CTS);
 			el.style.width = newWidth + '%';
 		}
-		else {
-			alert("You are already working on this language. Click 'Edit' to modify it.");
-			return;
-		}
 
 		// TODO: Get this out of hardcoding to support all RTL langs
 		if (sentence.lang === 'fas')
@@ -642,9 +651,6 @@ define(function() {
 			var translations = sentence.words[j].translations.map(function(word) {
 				return word.CTS;
 			}).toString();
-
-			if (translations.length > 0)
-				word.className = 'aligned';
 
 			word.setAttribute('data-translations', translations);
 			word.setAttribute('data-cts', sentence.words[j].CTS);
@@ -769,7 +775,7 @@ define(function() {
 	if (!HTMLElement.prototype.removeClass) {
 		HTMLElement.prototype.removeClass = function(remove) {
 			var newList = '';
-			var classes = this.className.split(" ");
+			var classes = this.className.trim().split(" ");
 			for (var i = 0; i < classes.length; i++) {
 				if (classes[i] !== remove)
 					newList += classes[i] + " ";

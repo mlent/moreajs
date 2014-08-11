@@ -295,7 +295,7 @@
         cursor: pointer; }
       .morea .sentence span.hovered {
         background-color: #FCEBD6; }
-      .morea .sentence span.aligned {
+      .morea .sentence span[data-translations^="urn"], .morea .sentence span[data-translations^=",urn"] {
         border-bottom: 2px solid #DDD; }
       .morea .sentence span.linked {
         background-color: #FADCB0;

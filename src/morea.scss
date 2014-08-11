@@ -365,7 +365,7 @@ $bookmark-color: #5E74A5;
 				background-color: #FCEBD6;
 			}
 
-			&.aligned {
+			&[data-translations^="urn"], &[data-translations^=",urn"] {
 				border-bottom: 2px solid #DDD; 
 			}
 
