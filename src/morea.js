@@ -49,31 +49,37 @@ define(function() {
 			this.data = this.config.data;
 		else {
 			this.data = [];
+
+			/*
+			* Existing modes: create, play, edit. In all modes but create, we need existing translations.
+			*/
+			var url = this.config.dataUrl;
+			if (this.config.mode !== 'create')
+				url += '?full=True';
+
 			this._fetchData(this.config.dataUrl, function(responseText) {
 				this.data[0] = JSON.parse(responseText);
 				var langs = Object.keys(this.data[0].translations);
 
 				this.config.langs = this.data[0].translations;
 
-				/*
-				* Existing modes: create, play, edit. In all modes but create, we need existing translations.
-				*/
+				// Erase unneeded alignment data from original sentence
+				if (this.config.mode !== 'edit') {
+					this.data[0].words.forEach(function(word) {
+						word.translations = [];
+					});
+				}
+
 				if (this.config.mode !== 'create') {
-					for (var i = 0; i < langs.length; i++)
-						this._fetchData(this.data[0].translations[langs[i]] + '?full=True');
+					for (var i = 0; i < langs.length; i++) {
+						var url = this.data[0].translations[langs[i]] + '?full=True';
+						this._fetchData(url);
+					}
 				}
 
 			}.bind(this));
 		}
 
-		if (this.config.mode === 'play') {
-			this.data.forEach(function(sentObj) {
-				var words = sentObj.words;
-
-				for (var i = 0, word; word = words[i]; i++)
-					word.translations = [];
-			});
-		}
 	};
 
 	morea.prototype._fetchData = function(dataUrl, callback) {
@@ -86,6 +92,14 @@ define(function() {
 				// Render this sentence
 				var sentence = JSON.parse(request.responseText);
 				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
+
+				// Ensure that each word has a translation field. Erase if not in edit mode.
+				if (this.config.mode !== 'play') {
+					sentence.words.forEach(function(word) {
+						word.translations = [];
+					});
+				}
+
 				this.data.push(sentence);
 				this.renderSentence(sentence);
 
@@ -357,19 +371,20 @@ define(function() {
 	};
 
 	morea.prototype.toggleForm = function(e) {
-		e.preventDefault();
+		if (e) e.preventDefault();
+		var el = this.header.querySelector('#btn-add-translation');
 
 		var form = this.header.querySelector('form');
 		if (form !== null && form.className !== 'open') {
 			form.className = 'open';
-			e.toElement.innerHTML = 'Close';
+			el.innerHTML = 'Close';
 		}
 		else if (form !== null && form.className === 'open') { 
 			form.className = '';
-			e.toElement.innerHTML = 'Add Translation';
+			el.innerHTML = 'Add Translation';
 		}
 		else {
-			e.toElement.innerHTML = 'Close';
+			el.innerHTML = 'Close';
 			this._renderForm();
 			this.header.querySelector('form').className = 'open';
 		}
@@ -484,7 +499,12 @@ define(function() {
 		e.preventDefault();
 
 		var form = this.header.querySelector('form');
-		var s = form.querySelector('textarea').value.trim();
+		this.toggleForm();
+
+		// Retrieve then clean sentence input
+		var sentenceInput = form.querySelector('textarea');
+		var s = sentenceInput.value.trim();
+		sentenceInput.value = '';
 		
 		if (form.querySelector('input[name="tokenize-punctuation"]').checked) {
 			s = s.replace(/([\.,-\/#!$%\^&\*;:{}=\-_`~()])/g, " \$1");
@@ -585,15 +605,20 @@ define(function() {
 
 	morea.prototype.renderSentence = function(sentence) {
 
+		// Adjust width of sentences
+		var newWidth = 100 / this.data.length;
+
 		var el, lang;
 		if (this.el.querySelector('[data-cts="' + sentence.CTS + '"]') === null) {
 			el = document.createElement('div');
 			el.className = 'sentence';
 			el.setAttribute('lang', sentence.lang);
 			el.setAttribute('data-cts', sentence.CTS);
+			el.style.width = newWidth + '%';
 		}
 		else {
-			el = this.el.querySelector('[data-cts="' + sentence.CTS + '"]');
+			alert("You are already working on this language. Click 'Edit' to modify it.");
+			return;
 		}
 
 		// TODO: Get this out of hardcoding to support all RTL langs
@@ -631,6 +656,11 @@ define(function() {
 
 			el.appendChild(word);
 			el.appendChild(document.createTextNode(' '));
+		}
+
+		var els = this.el.querySelectorAll('.sentence');
+		for (var i = 0; i < els.length; i++) {
+			els[i].style.width = newWidth + '%';
 		}
 
 		this.el.appendChild(el);

@@ -139,7 +139,7 @@ $bookmark-color: #5E74A5;
 	.icon-lock-open-filled:before { content: '\e810'; } /* '' */
 	.icon-pin:before { content: '\e811'; } /* '' */
 		
-	*[lang="grc"] {
+	span[lang="grc"] {
 		font-family: $greek-font;
 		letter-spacing: 1px;
 	}

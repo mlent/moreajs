@@ -141,7 +141,7 @@
     content: '\e810'; }
   .morea .icon-pin:before {
     content: '\e811'; }
-  .morea *[lang="grc"] {
+  .morea span[lang="grc"] {
     font-family: Cambria, Serif;
     letter-spacing: 1px; }
   .morea.editing .btn-container {
