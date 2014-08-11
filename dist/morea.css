@@ -227,15 +227,40 @@
   .morea .sentence {
     vertical-align: top;
     display: inline-block;
-    width: 33%;
+    width: 25%;
     min-width: 200px;
-    padding: 5px 20px;
+    padding: 20px;
     box-sizing: border-box;
     position: relative;
     line-height: 60px;
     /* Close button */ }
+    .morea .sentence:first-child {
+      border-left: 1px dotted #DDD; }
     .morea .sentence:not(:last-child) {
-      border-right: 1px solid #DDD; }
+      border-right: 1px dotted #DDD; }
+    .morea .sentence:before {
+      content: attr(lang);
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: #5e74a5;
+      padding: 5px;
+      line-height: 14px;
+      font-size: 12px;
+      color: #FEFEFE;
+      height: 20px;
+      width: 10px;
+      text-align: center; }
+    .morea .sentence:after {
+      content: "";
+      width: 0;
+      height: 0;
+      position: absolute;
+      top: 25px;
+      left: 0px;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 5px solid #FFF; }
     .morea .sentence.rtl {
       direction: rtl; }
       .morea .sentence.rtl a {

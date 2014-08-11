@@ -11,6 +11,7 @@
 
 $greek-font: Cambria, Serif;
 $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif; 
+$bookmark-color: #5E74A5;
 
 .morea {
 
@@ -265,17 +266,51 @@ $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
 	}
 
 	.sentence {
+		
+		$left: 20px;
+
 		vertical-align: top;
 		display: inline-block;
-		width: 33.3%;
+		width: 25%;
 		min-width: 200px;
-		padding: 5px 20px;
+		padding: $left;
 		box-sizing: border-box;
 		position: relative;
 		line-height: 60px;
 
+		&:first-child {
+			border-left: 1px dotted #DDD;	
+		}
+
 		&:not(:last-child) {
-			border-right: 1px solid #DDD;
+			border-right: 1px dotted #DDD;
+		}
+
+		&:before {
+			content: attr(lang);
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: $bookmark-color;
+			padding: 5px;
+			line-height: 14px;
+			font-size: 12px;
+			color: #FEFEFE;
+			height: 20px;
+			width: 10px;
+			text-align: center;
+		}
+
+		&:after {
+			content: "";
+			width: 0;
+			height: 0;
+			position: absolute;
+			top: 25px;
+			left: 0px;
+			border-left: 10px solid transparent;
+			border-right: 10px solid transparent;
+			border-bottom: 5px solid #FFF;
 		}
 
 		&.rtl {

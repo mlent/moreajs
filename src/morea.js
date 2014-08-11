@@ -74,6 +74,7 @@ define(function() {
 
 				// Render this sentence
 				var sentence = JSON.parse(request.responseText);
+				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
 				this.data.push(sentence);
 				this.renderSentence(sentence);
 
@@ -384,6 +385,11 @@ define(function() {
 				"hr": "فارسی",
 				"code": "fas",
 				"dir": "rtl"
+			},
+			{
+				"hr": "Hrvatski",
+				"code": "hr",
+				"dir": "ltr"
 			}
 		];
 
@@ -550,26 +556,20 @@ define(function() {
 		if (this.el.querySelector('[data-cts="' + sentence.CTS + '"]') === null) {
 			el = document.createElement('div');
 			el.className = 'sentence';
+			el.setAttribute('lang', sentence.lang);
 			el.setAttribute('data-cts', sentence.CTS);
 		}
 		else {
 			el = this.el.querySelector('[data-cts="' + sentence.CTS + '"]');
 		}
 
-		// HACK, til we have lang attrs
-		if (sentence.CTS.indexOf('fas') !== -1)
-			lang = 'fas';
-		else if (sentence.CTS.indexOf('eng') !== -1)
-			lang = 'eng';
-		else
-			lang = 'grc';
-
-		if (lang === 'fas')
+		// TODO: Get this out of hardcoding to support all RTL langs
+		if (sentence.lang === 'fas')
 			el.className += ' rtl';
 
 		el.innerHTML = '';
 
-		if (lang !== 'grc') {
+		if (sentence.lang !== 'grc') {
 			var x = document.createElement('a');
 			x.setAttribute('href', '#');
 			x.setAttribute('title', 'Close Translation');
@@ -590,7 +590,7 @@ define(function() {
 
 			word.setAttribute('data-translations', translations);
 			word.setAttribute('data-cts', sentence.words[j].CTS);
-			word.setAttribute('lang', lang);
+			word.setAttribute('lang', sentence.lang);
 
 			word.addEventListener("mouseover", this.focusNode.bind(this));
 			word.addEventListener("mouseout", this.unfocusNodes.bind(this));
