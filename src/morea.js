@@ -45,8 +45,20 @@ define(function() {
 
 		this.render();
 
-		if (this.config.data.length !== 0)
+		// TODO: Rip this out and come up with a robust solution for data population
+		if (this.config.data.length !== 0) {
 			this.data = this.config.data;
+
+			for (var i = 0; i < this.data.length; i++) {
+				this.renderSentence(this.data[i]);
+
+				// Play mode
+				this.data[i].words.forEach(function(word) {
+					word.answers = word.translations;
+					word.translations = [];
+				});
+			}
+		}
 		else {
 			this.data = [];
 
@@ -534,13 +546,6 @@ define(function() {
 		this.header = document.createElement('div');
 		this.header.className = 'header';
 
-		// Add Translation Link
-		var btnAddTrans = document.createElement('a');
-		btnAddTrans.innerHTML = 'Add Translation';
-		btnAddTrans.className = 'btn';
-		btnAddTrans.setAttribute('id', 'btn-add-translation');
-		btnAddTrans.setAttribute('href', '#');
-
 		// Button container
 		var btnContainer = document.createElement('div');
 		btnContainer.className = 'btn-container';
@@ -564,15 +569,23 @@ define(function() {
 		btnMerge.setAttribute('id', 'btn-merge');
 		btnMerge.setAttribute('href', '#');
 
-		// Event Listeners
-		btnAddTrans.addEventListener('click', this.toggleForm.bind(this));
-		btnDone.addEventListener('click', this.stopEditing.bind(this));
+		// Only users who are editing or creating can add their own translation
+		if (this.config.mode !== 'play') {
+
+			// Add Translation Link
+			var btnAddTrans = document.createElement('a');
+			btnAddTrans.innerHTML = 'Add Translation';
+			btnAddTrans.className = 'btn';
+			btnAddTrans.setAttribute('id', 'btn-add-translation');
+			btnAddTrans.setAttribute('href', '#');
+
+			btnAddTrans.addEventListener('click', this.toggleForm.bind(this));
+			this.header.appendChild(btnAddTrans);
+		}
 
 		// Editing Buttons
-		this.header.appendChild(btnAddTrans);
 		btnContainer.appendChild(btnDone);
-		//this.header.appendChild(btnEdit);
-		//this.header.appendChild(btnMerge);
+		btnDone.addEventListener('click', this.stopEditing.bind(this));
 		this.header.appendChild(btnContainer);
 		this.el.appendChild(this.header);
 	};
@@ -606,7 +619,7 @@ define(function() {
 
 		el.innerHTML = '';
 
-		if (sentence.lang !== 'grc') {
+		if (sentence.lang !== 'grc' && this.config.mode === 'edit') {
 			var x = document.createElement('a');
 			x.setAttribute('href', '#');
 			x.setAttribute('title', 'Close Translation');

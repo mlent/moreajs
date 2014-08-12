@@ -281,7 +281,6 @@ $bookmark-color: #5E74A5;
 
 		vertical-align: top;
 		display: inline-block;
-		width: 25%;
 		min-width: 200px;
 		padding: $left;
 		box-sizing: border-box;
@@ -298,6 +297,7 @@ $bookmark-color: #5E74A5;
 
 		&:before {
 			content: attr(lang);
+			box-sizing: initial;
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -321,6 +321,7 @@ $bookmark-color: #5E74A5;
 			border-left: 12px solid transparent;
 			border-right: 13px solid transparent;
 			border-bottom: 5px solid #FFF;
+			box-sizing: initial;
 		}
 
 		&.rtl {
