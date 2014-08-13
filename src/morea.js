@@ -41,6 +41,7 @@ define(function() {
 	morea.prototype.init = function() {
 		this.config = this._extend({}, this.defaults, this.options);
 		
+		this._toggleOrientation();
 		this._addEvent(window, "resize", this._toggleOrientation.bind(this));
 
 		this.render();
@@ -50,13 +51,16 @@ define(function() {
 			this.data = this.config.data;
 
 			for (var i = 0; i < this.data.length; i++) {
-				this.renderSentence(this.data[i]);
 
 				// Play mode
 				this.data[i].words.forEach(function(word) {
 					word.answers = word.translations;
 					word.translations = [];
+
+					console.log(word.translations);
 				});
+
+				this.renderSentence(this.data[i]);
 			}
 		}
 		else {
@@ -124,7 +128,7 @@ define(function() {
 				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
 
 				// Ensure that each word has a translation field. Erase if not in edit mode.
-				if (this.config.mode !== 'play') {
+				if (this.config.mode === 'play') {
 					sentence.words.forEach(function(word) {
 						word.translations = [];
 					});
@@ -212,6 +216,53 @@ define(function() {
 		}
 
 		this.el.removeClass('editing');
+
+		if (this.config.mode === 'play') {
+			this.checkAnswers();
+		}
+	};
+	
+	morea.prototype.checkAnswers = function() {
+
+		// Get nodes. Check their translations in the data.
+		var wordNodes = this.el.querySelectorAll('span');
+		var wordData = [].concat.apply([], this.data.map(function(sentence) {
+			return sentence.words;
+		}));
+
+		for (var i = 0; i < wordNodes.length; i++) {
+			var CTS = wordNodes[i].dataset.cts;
+			
+			var dataPoint = wordData.filter(function(word) {
+				return word.CTS === CTS;
+			})[0];
+			var answers = [].concat.apply([], dataPoint.answers.map(function(t) {
+				return t.CTS;
+			}));
+
+			var trans = wordNodes[i].dataset.translations.split(",");
+
+			var matches = trans.filter(function(t) {
+				return answers.indexOf(t) !== -1;
+			});
+
+			if (matches.length === answers.length) {
+				console.log("Correct! - CTS ", CTS, "has answers ", answers, "and was translated as", trans);
+				this.el.querySelector('span[data-cts="' + CTS + '"]').style.color = '#0F0';
+			}
+			else if (trans.length !== 0) {
+				console.log("Incorrect or incomplete!");
+				this.el.querySelector('span[data-cts="' + CTS + '"]').style.color = '#F00';
+			}
+			else {
+				this.el.querySelector('span[data-cts="' + CTS + '"]').style.color = '#333';
+			}
+			
+		}
+
+		// Visually indicate correct alignment
+
+		// Increment points
 	};
 
 	morea.prototype.createLink = function(e) {
@@ -292,7 +343,8 @@ define(function() {
 
 			// Update DOM
 			var el = this.el.querySelector('span[data-cts="' + dest.CTS + '"]');
-			var trans = el.dataset.translations.split(",");
+			var trans = el.dataset.translations;
+			trans = trans.length === 0 ? [] : trans.split(",");
 			el.setAttribute('data-translations', trans.concat(links).join(","));
 			el.addClass('linked');
 		}
@@ -316,7 +368,8 @@ define(function() {
 
 				// Update DOM
 				var el = this.el.querySelector('span[data-cts="' + dest[i].CTS + '"]');
-				var trans = el.dataset.translations.split(",");
+				var trans = el.dataset.translations;
+				trans = trans.length === 0 ? [] : trans.split(",");
 				trans.push(source.CTS);
 				el.setAttribute('data-translations', trans.join(","));
 				el.addClass('linked');
@@ -370,11 +423,15 @@ define(function() {
 		dest.translations = dest.translations.filter(function(obj) {
 			return obj.CTS !== source.CTS;
 		});
+		
+		var el = this.el.querySelector('span[data-cts="' + dest.CTS + '"]');
+		el.setAttribute('data-translations', dest.translations.join(","));
 
-		var el = this.el.querySelector('span[data-cts="' + source.CTS + '"]');
-		var trans = el.dataset.translations.split(",");
+		el = this.el.querySelector('span[data-cts="' + source.CTS + '"]');
+		var trans = el.dataset.translations;
+		trans = trans.length === 0 ? [] : trans.split(",");
 		trans.splice(trans.indexOf(source.CTS), 1);
-		el.setAttribute('data-translations', trans.join());
+		el.setAttribute('data-translations', trans.join(","));
 	};
 
 	morea.prototype.unfocusNodes = function(e) {
