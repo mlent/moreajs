@@ -277,10 +277,81 @@
       cursor: pointer;
       margin: 5px;
       display: block; }
+  .morea .tracker {
+    color: #FFF;
+    position: absolute;
+    width: 100%;
+    line-height: 14px;
+    font-size: 12px; }
+  .morea .points {
+    background-color: #1fadad;
+    position: absolute;
+    padding: 5px 10px;
+    display: inline-block;
+    top: 5px;
+    margin: 5px;
+    -webkit-transition: background-color .5s ease-out;
+    -moz-transition: background-color .5s ease-out;
+    -o-transition: background-color .5s ease-out;
+    transition: background-color .5s ease-out; }
+    .morea .points.error {
+      background-color: #d66556;
+      -webkit-transition: background-color .5s ease-in;
+      -moz-transition: background-color .5s ease-in;
+      -o-transition: background-color .5s ease-in;
+      transition: background-color .5s ease-in; }
+    .morea .points.success {
+      background-color: #27d8d8;
+      -webkit-transition: background-color .5s ease-in;
+      -moz-transition: background-color .5s ease-in;
+      -o-transition: background-color .5s ease-in;
+      transition: background-color .5s ease-in; }
+  .morea .feedback {
+    position: absolute;
+    left: 40px;
+    top: 5px;
+    margin: 5px;
+    padding: 5px;
+    background: #333;
+    border-radius: 3px;
+    width: auto;
+    display: inline-block;
+    -webkit-transition: background-color .5s ease-out;
+    -moz-transition: background-color .5s ease-out;
+    -o-transition: background-color .5s ease-out;
+    transition: background-color .5s ease-out; }
+    .morea .feedback:after {
+      content: '';
+      position: absolute;
+      border-style: solid;
+      border-width: 5px 5px 5px 0;
+      border-color: transparent #333;
+      display: block;
+      width: 0;
+      z-index: 1;
+      margin-top: -5px;
+      left: -5px;
+      top: 50%;
+      -webkit-transition: border-color 5s ease-out;
+      -moz-transition: border-color .5s ease-out;
+      -o-transition: border-color .5s ease-out;
+      transition: border-color .5s ease-out; }
+    .morea .feedback.hidden {
+      color: transparent;
+      background-color: transparent;
+      -webkit-transition: background-color .5s ease-out;
+      -moz-transition: background-color .5s ease-out;
+      -o-transition: background-color .5s ease-out;
+      transition: background-color .5s ease-out; }
+      .morea .feedback.hidden:after {
+        border-color: transparent transparent;
+        -webkit-transition: border-color 5s ease-out;
+        -moz-transition: border-color .5s ease-out;
+        -o-transition: border-color .5s ease-out;
+        transition: border-color .5s ease-out; }
   .morea .header {
     display: block;
     background-color: #EEE;
-    padding: 5px;
     overflow: auto;
     min-height: 45px;
     width: 100%;
@@ -296,7 +367,7 @@
       display: inline-block;
       padding: 5px;
       font-size: 12px;
-      margin: 5px;
+      margin: 2px;
       line-height: 14px;
       border-radius: 2px; }
       .morea .header .btn:before {

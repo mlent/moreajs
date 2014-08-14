@@ -158,6 +158,7 @@ define(function() {
 					callback(request.responseText);
 
 				this.renderSentence(sentence);
+				this.header.querySelector('.feedback').addClass('hidden'); 
 
 			}
 			else
@@ -248,6 +249,8 @@ define(function() {
 			return sentence.words;
 		}));
 
+		var msg = "", points = 0;
+
 		for (var i = 0; i < wordNodes.length; i++) {
 			var CTS = wordNodes[i].dataset.cts;
 			
@@ -271,19 +274,25 @@ define(function() {
 			var matches = guesses.filter(function(g) {
 				return answers.indexOf(g) !== -1;
 			});
+			points += matches.length;
 
 			console.log(wordNodes[i].innerHTML, "\nguesses", guesses, "\nanswers", answers, "\nmatches", matches);
 			console.log("----");
+
 			if (matches.length === answers.length && answers.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bounce');
 			}
 			else if (guesses.length < answers.length) {
 				console.log("mark all guesses as incomplete");
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				msg = msg.length === 0 ? "This phrase requires more words." : msg;
 			}
 			else if (guesses.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('wiggle');
+				msg = msg.length === 0 ? "One or more of these words isn't right." : msg;
 			}
 			else {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
@@ -291,6 +300,37 @@ define(function() {
 			}
 			
 		}
+
+		// Give user feedback
+		msg = msg.length === 0 ? "Great Job!" : msg;
+		this.showFeedback(msg);
+		this.updatePoints(points);
+	};
+
+	morea.prototype.updatePoints = function(points) {
+		var el = this.header.querySelector('.points');
+		var currPoints = parseInt(el.innerHTML);
+		if (points > currPoints) {
+			el.addClass('bounce');
+			el.addClass('success');
+			this._delayRemoveClass(el, 'bounce', 3000);
+			this._delayRemoveClass(el, 'success', 3000);
+		}
+		else if (points < currPoints) {
+			el.addClass('wiggle');
+			el.addClass('error');
+			this._delayRemoveClass(el, 'wiggle', 3000);
+			this._delayRemoveClass(el, 'error', 3000);
+		}
+		el.innerHTML = points;
+	};
+
+	morea.prototype.showFeedback = function(msg) {
+		var el = this.header.querySelector('.feedback');
+		el.removeClass('hidden');
+		el.innerHTML = msg;
+
+		this._delayAddClass(el, 'hidden', 3000);
 	};
 
 	morea.prototype.createLink = function(e) {
@@ -667,6 +707,9 @@ define(function() {
 		btnMerge.setAttribute('id', 'btn-merge');
 		btnMerge.setAttribute('href', '#');
 
+		var trackerContainer = document.createElement('div');
+		trackerContainer.className = 'tracker';
+
 		// Only users who are editing or creating can add their own translation
 		if (this.config.mode !== 'play') {
 
@@ -680,6 +723,20 @@ define(function() {
 			btnAddTrans.addEventListener('click', this.toggleForm.bind(this));
 			this.header.appendChild(btnAddTrans);
 		}
+		else {
+
+			// Only append points if in play mode
+			var points = document.createElement('div');
+			points.className = 'points';
+			points.innerHTML = '0';
+			trackerContainer.appendChild(points);
+		}
+
+		// Feedback
+		var feedback = document.createElement('div');
+		feedback.className = 'feedback';
+		feedback.innerHTML = 'Loading Alignments...';
+		trackerContainer.appendChild(feedback);
 
 		// Editing Buttons
 		btnContainer.appendChild(btnDone);
@@ -688,6 +745,7 @@ define(function() {
 		// Enter automatically assumes done
 		this._addEvent(window, "keypress", this.stopEditing.bind(this));
 
+		this.header.appendChild(trackerContainer);
 		this.header.appendChild(btnContainer);
 		this.el.appendChild(this.header);
 	};
@@ -864,6 +922,17 @@ define(function() {
 			if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
 
 		return copy;
+	};
+
+	morea.prototype._delayAddClass = function(el, className, waitTime) {
+		setTimeout(function() {
+			el.addClass(className);
+		}, waitTime);
+	};
+	morea.prototype._delayRemoveClass = function(el, className, waitTime) {
+		setTimeout(function() {
+			el.removeClass(className);
+		}, waitTime);
 	};
 
 	if (!HTMLElement.prototype.removeClass) {

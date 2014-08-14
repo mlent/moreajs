@@ -102,6 +102,8 @@
 $greek-font: Cambria, Serif;
 $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif; 
 $bookmark-color: #5E74A5;
+$points-color: #1FADAD;
+$points-error-color: #D66556;
 
 .morea {
 
@@ -309,10 +311,94 @@ $bookmark-color: #5E74A5;
 		}
 	}
 
+	.tracker {
+		color: #FFF;
+		position: absolute;
+		width: 100%;
+		line-height: 14px;
+		font-size: 12px;
+	}
+	.points {
+		background-color: $points-color;
+		position: absolute;
+		padding: 5px 10px;
+		display: inline-block;
+		top: 5px;
+		margin: 5px;
+		-webkit-transition: background-color .5s ease-out;
+		-moz-transition: background-color .5s ease-out;
+		-o-transition: background-color .5s ease-out;
+		transition: background-color .5s ease-out;
+
+		&.error {
+			background-color: $points-error-color;
+			-webkit-transition: background-color .5s ease-in;
+			-moz-transition: background-color .5s ease-in;
+			-o-transition: background-color .5s ease-in;
+			transition: background-color .5s ease-in;
+		}
+		&.success {
+			background-color: lighten($points-color, 10%);
+			-webkit-transition: background-color .5s ease-in;
+			-moz-transition: background-color .5s ease-in;
+			-o-transition: background-color .5s ease-in;
+			transition: background-color .5s ease-in;
+		}
+	}
+	.feedback {
+		position: absolute;
+		left: 40px;
+		top: 5px;
+		margin: 5px;
+		padding: 5px;
+		background: #333;
+		border-radius: 3px;
+		width: auto;
+		display: inline-block;
+		-webkit-transition: background-color .5s ease-out;
+		-moz-transition: background-color .5s ease-out;
+		-o-transition: background-color .5s ease-out;
+		transition: background-color .5s ease-out;
+
+		&:after {
+			content: '';
+			position: absolute;
+			border-style: solid;
+			border-width: 5px 5px 5px 0;
+			border-color: transparent #333;
+			display: block;
+			width: 0;
+			z-index: 1;
+			margin-top: -5px;
+			left: -5px;
+			top: 50%;
+			-webkit-transition: border-color 5s ease-out;
+			-moz-transition: border-color .5s ease-out;
+			-o-transition: border-color .5s ease-out;
+			transition: border-color .5s ease-out;
+		}
+
+		&.hidden {
+			color: transparent;
+			background-color: transparent;
+			-webkit-transition: background-color .5s ease-out;
+			-moz-transition: background-color .5s ease-out;
+			-o-transition: background-color .5s ease-out;
+			transition: background-color .5s ease-out;
+
+			&:after {
+				border-color: transparent transparent;
+				-webkit-transition: border-color 5s ease-out;
+				-moz-transition: border-color .5s ease-out;
+				-o-transition: border-color .5s ease-out;
+				transition: border-color .5s ease-out;
+			}
+		}
+	}
+
 	.header {
 		display: block;
 		background-color: #EEE;
-		padding: 5px;
 		overflow: auto;
 		min-height: 45px;
 		width: 100%;
@@ -331,7 +417,7 @@ $bookmark-color: #5E74A5;
 			display: inline-block;
 			padding: 5px;
 			font-size: 12px;
-			margin: 5px;
+			margin: 2px;
 			line-height: 14px;
 			border-radius: 2px;
 
