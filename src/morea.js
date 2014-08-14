@@ -32,7 +32,8 @@ define(function() {
 		data: [],						// Array of sentence objects
 		dataUrl: undefined,				// Or an endpoint + callback to process the data
 		orientation: 'horizontal',
-		user: 'tester'
+		user: 'tester',
+		targets: []
 	};
 
 	/**
@@ -41,8 +42,8 @@ define(function() {
 	morea.prototype.init = function() {
 		this.config = this._extend({}, this.defaults, this.options);
 		
-		this._toggleOrientation();
 		this._addEvent(window, "resize", this._toggleOrientation.bind(this));
+		this.el.addClass('horizontal');
 
 		this.render();
 
@@ -53,12 +54,13 @@ define(function() {
 			for (var i = 0; i < this.data.length; i++) {
 
 				// Play mode
-				this.data[i].words.forEach(function(word) {
-					word.answers = word.translations;
-					word.translations = [];
-
-					console.log(word.translations);
-				});
+				var that = this;
+				if (this.config.mode === 'play') {
+					this.data[i].words.forEach(function(word) {
+						word.answers = that._clone(word.translations) || [];
+						word.translations = [];
+					});
+				}
 
 				this.renderSentence(this.data[i]);
 			}
@@ -73,10 +75,20 @@ define(function() {
 			if (this.config.mode !== 'create')
 				url += '?full=True';
 
-			this._fetchData(this.config.dataUrl, function(responseText) {
-				this.data[0] = JSON.parse(responseText);
-				var langs = Object.keys(this.data[0].translations);
+			this._fetchData(url, function(responseText) {
 				var that = this;
+				this.data[0] = JSON.parse(responseText);
+
+				// Get the available languages
+				var langs = Object.keys(this.data[0].translations);
+
+				// Filter out so we're only returning target languages
+				langs = langs.filter(function(l) {
+					if (that.config.targets.length === 0)
+						return true;
+					else
+						return that.config.targets.indexOf(l) !== -1;
+				});
 
 				// TODO: replace all this gnarly code, when we have lang at doc level. Should come in to us as a config.
 				// This config setting should be set by some translation engine outside of this plugin
@@ -89,6 +101,7 @@ define(function() {
 					};
 					return map;
 				}, {});
+
 				// Need to deal with localization outside of this code, at application level
 				this.config.langs[this.data[0].words[0].lang] = {
 					"hr": "Greek",
@@ -96,12 +109,15 @@ define(function() {
 					"dir": "ltr"
 				};
 
-				// Erase unneeded alignment data from original sentence
-				if (this.config.mode !== 'edit') {
-					this.data[0].words.forEach(function(word) {
-						word.translations = [];
+				// Erase unneeded alignment data from original sentence, store as answers
+				this.data[0].words.forEach(function(word) {
+					console.log(word.value, word.CTS, word.translations);
+					word.answers = that._clone(word.translations) || [];
+					word.answers = word.answers.filter(function(w) {
+						return that.config.targets.indexOf(w.lang) !== -1;
 					});
-				}
+					word.translations = [];
+				});
 
 				// Only fetch existing alignments if we're going to use them
 				if (this.config.mode !== 'create') {
@@ -113,7 +129,6 @@ define(function() {
 
 			}.bind(this));
 		}
-
 	};
 
 	morea.prototype._fetchData = function(dataUrl, callback) {
@@ -124,12 +139,14 @@ define(function() {
 			if (request.status >= 200 && request.status < 400) {
 
 				// Render this sentence
+				var that = this;
 				var sentence = JSON.parse(request.responseText);
 				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
 
 				// Ensure that each word has a translation field. Erase if not in edit mode.
 				if (this.config.mode === 'play') {
 					sentence.words.forEach(function(word) {
+						word.answers = that._clone(word.translations) || [];
 						word.translations = [];
 					});
 				}
@@ -205,7 +222,8 @@ define(function() {
 	};
 
 	morea.prototype.stopEditing = function(e) {
-		e.preventDefault();
+		if (e) e.preventDefault();
+
 		this.unfocusNodes();
 
 		var wordNodes = this.el.querySelectorAll('span');
@@ -233,36 +251,46 @@ define(function() {
 		for (var i = 0; i < wordNodes.length; i++) {
 			var CTS = wordNodes[i].dataset.cts;
 			
-			var dataPoint = wordData.filter(function(word) {
+			// Get arrays of CTS ids - one of guesses, one of answers. 
+			var guesses = wordNodes[i].dataset.translations;
+			guesses = guesses.length === 0 ? [] : guesses.split(",");
+
+			var answers = wordData.filter(function(word) {
 				return word.CTS === CTS;
-			})[0];
-			var answers = [].concat.apply([], dataPoint.answers.map(function(t) {
-				return t.CTS;
-			}));
-
-			var trans = wordNodes[i].dataset.translations.split(",");
-
-			var matches = trans.filter(function(t) {
-				return answers.indexOf(t) !== -1;
+			})[0].answers.map(function(a) {
+				return a.CTS;
 			});
 
-			if (matches.length === answers.length) {
-				console.log("Correct! - CTS ", CTS, "has answers ", answers, "and was translated as", trans);
-				this.el.querySelector('span[data-cts="' + CTS + '"]').style.color = '#0F0';
+			if (guesses.length === 0) {
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				continue;
 			}
-			else if (trans.length !== 0) {
-				console.log("Incorrect or incomplete!");
-				this.el.querySelector('span[data-cts="' + CTS + '"]').style.color = '#F00';
+
+			// Create a list of matches
+			var matches = guesses.filter(function(g) {
+				return answers.indexOf(g) !== -1;
+			});
+
+			console.log(wordNodes[i].innerHTML, "\nguesses", guesses, "\nanswers", answers, "\nmatches", matches);
+			console.log("----");
+			if (matches.length === answers.length && answers.length !== 0) {
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bounce');
+			}
+			else if (guesses.length < answers.length) {
+				console.log("mark all guesses as incomplete");
+			}
+			else if (guesses.length !== 0) {
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('wiggle');
 			}
 			else {
-				this.el.querySelector('span[data-cts="' + CTS + '"]').style.color = '#333';
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 			}
 			
 		}
-
-		// Visually indicate correct alignment
-
-		// Increment points
 	};
 
 	morea.prototype.createLink = function(e) {
@@ -331,7 +359,7 @@ define(function() {
 			//	2. One of the languages isn't the primary source (e.g. don't align english to farsi)
 
 			source = source.filter(function(word) {
-				return word.lang !== dest.lang && (word.lang === 'grc' || dest.lang === 'grc');
+				return (word.lang !== dest.lang) && (word.lang === 'grc' || dest.lang === 'grc') && (word.CTS !== dest.CTS);
 			});
 
 			// Return if no words fit criteria
@@ -340,6 +368,9 @@ define(function() {
 
 			// Update data structure
 			dest.translations = dest.translations.concat(source);
+			links = source.map(function(obj) {
+				return obj.CTS;
+			});
 
 			// Update DOM
 			var el = this.el.querySelector('span[data-cts="' + dest.CTS + '"]');
@@ -361,7 +392,7 @@ define(function() {
 				if (!isNew) continue;
 
 				// Filter the destination out if it's the same language as source
-				if (dest[i].lang === source.lang || (source.lang !== 'grc' && dest[i].lang !== 'grc')) continue;
+				if (dest[i].lang === source.lang || dest[i].CTS === source.CTS || (source.lang !== 'grc' && dest[i].lang !== 'grc')) continue;
 
 				// Update data structure
 				dest[i].translations.push(source);
@@ -404,6 +435,8 @@ define(function() {
 			for (var i = 0, word; word = words[i]; i++) {
 				if (links.indexOf(word.CTS) !== -1)  {
 
+					console.log(word, newWord);
+
 					// Splice out our targetCTS from links
 					that.removeTranslation(word, newWord);
 					that.removeTranslation(newWord, word);
@@ -419,13 +452,17 @@ define(function() {
 	 */
 	morea.prototype.removeTranslation = function(source, dest) {
 
-		// Update data structure and DOM
+		// Update data structure 
 		dest.translations = dest.translations.filter(function(obj) {
 			return obj.CTS !== source.CTS;
 		});
-		
+
+		// and DOM
+		var words = [].concat.apply([], dest.translations.map(function(word) {
+			return word.CTS;
+		}));
 		var el = this.el.querySelector('span[data-cts="' + dest.CTS + '"]');
-		el.setAttribute('data-translations', dest.translations.join(","));
+		el.setAttribute('data-translations', words.join(","));
 
 		el = this.el.querySelector('span[data-cts="' + source.CTS + '"]');
 		var trans = el.dataset.translations;
@@ -443,6 +480,9 @@ define(function() {
 		}
 	};
 
+	/**
+	 * Inputs and outputs by CTS.
+	 */
 	morea.prototype._getAllRelatedAlignments = function(translations) {
 		var alignments = [];
 		var words = [].concat.apply([], this.data.map(function(sentence) {
@@ -489,6 +529,7 @@ define(function() {
 	};
 
 	morea.prototype._toggleOrientation = function(e) {
+
 		if (this.el.offsetWidth < 1000)
 			this.el.addClass('horizontal')
 		else
@@ -643,6 +684,10 @@ define(function() {
 		// Editing Buttons
 		btnContainer.appendChild(btnDone);
 		btnDone.addEventListener('click', this.stopEditing.bind(this));
+
+		// Enter automatically assumes done
+		this._addEvent(window, "keypress", this.stopEditing.bind(this));
+
 		this.header.appendChild(btnContainer);
 		this.el.appendChild(this.header);
 	};
@@ -810,6 +855,15 @@ define(function() {
 			updatedCTS += ":" + c.word;
 
 		return updatedCTS;
+	};
+
+	morea.prototype._clone = function(obj) {
+		if (null == obj || "object" != typeof obj) return obj;
+		var copy = obj.constructor();
+		for (var attr in obj)
+			if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
+
+		return copy;
 	};
 
 	if (!HTMLElement.prototype.removeClass) {

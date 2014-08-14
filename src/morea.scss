@@ -9,6 +9,96 @@
 	font-style: normal;
 }
 
+@mixin animate($name, $duration, $timing-function, $delay, $iteration-count) {
+	-webkit-animation: $name $duration $timing-function $delay $iteration-count;
+	-moz-animation: $name $duration $timing-function $delay $iteration-count;
+	-o-animation: $name $duration $timing-function $delay $iteration-count;
+	animation: $name $duration $timing-function $delay $iteration-count;
+}
+@-webkit-keyframes morea-wiggle {
+	0% {
+		-webkit-transform: rotateZ(5deg);
+	}
+	50% {
+		-webkit-transform: rotateZ(-5deg);
+	}
+	100% {
+		-webkit-transform: rotateZ(5deg);
+	}
+}
+@keyframes morea-wiggle {
+	0% {
+		-webkit-transform: rotateZ(5deg);
+	}
+	50% {
+		-webkit-transform: rotateZ(-5deg);
+	}
+	100% {
+		-webkit-transform: rotateZ(5deg);
+	}
+}
+
+@-webkit-keyframes morea-bounce {
+	0% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+	37% {
+		top: -9px;
+		animation-timing-function:ease-out;
+	}
+	55% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+	73% {
+		top: -5px;
+		animation-timing-function:ease-out;
+	}
+	82% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+	91% {
+		top: -2px;
+		animation-timing-function:ease-out;
+	}
+	100% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+}
+
+@keyframes morea-bounce {
+	0% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+	37% {
+		top: -9px;
+		animation-timing-function:ease-out;
+	}
+	55% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+	73% {
+		top: -5px;
+		animation-timing-function:ease-out;
+	}
+	82% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+	91% {
+		top: -2px;
+		animation-timing-function:ease-out;
+	}
+	100% {
+		top: 0px;
+		animation-timing-function:ease-in;
+	}
+}
 $greek-font: Cambria, Serif;
 $main-font: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif; 
 $bookmark-color: #5E74A5;
@@ -17,6 +107,13 @@ $bookmark-color: #5E74A5;
 
 	font-family: $main-font;
 	line-height: 36px;
+
+	.bounce {
+		@include animate(morea-bounce, .8s, ease, 0, 1);
+	}
+	.wiggle {
+		@include animate(morea-wiggle, .2s, ease, 0, 3);
+	}
 
 	.animate-spin {
 		-moz-animation: spin 2s infinite linear;
@@ -151,17 +248,17 @@ $bookmark-color: #5E74A5;
 		}
 		span {
 			&.selected {
-				background-color: #FFCB7C !important; 
+				border: 1px dotted #666 !important;
 			}
 
 			/* Unaligned, new link */
 			&[data-tooltip]:after {
 				content: '\e80c';
-				color: #FFF;
+				color: #FFF !important;
 				background-color: #5CB85C !important;
 			}
 			&:hover {
-				color: #FFF;
+				color: #FFF !important;
 				background-color: #5CB85C !important;
 			}
 		}
@@ -356,6 +453,15 @@ $bookmark-color: #5E74A5;
 
 		span {
 			padding: 5px;
+
+			&.bounce {
+				color: #5CB85C;
+			}
+
+			&.wiggle {
+				color: #D15241;
+				border-bottom-style: dashed !important;
+			}
 
 			&:hover {
 				background-color: #F8D3A7;

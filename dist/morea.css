@@ -5,6 +5,84 @@
   font-weight: normal;
   font-style: normal; }
 
+@-webkit-keyframes morea-wiggle {
+  0% {
+    -webkit-transform: rotateZ(5deg); }
+
+  50% {
+    -webkit-transform: rotateZ(-5deg); }
+
+  100% {
+    -webkit-transform: rotateZ(5deg); } }
+
+@keyframes morea-wiggle {
+  0% {
+    -webkit-transform: rotateZ(5deg); }
+
+  50% {
+    -webkit-transform: rotateZ(-5deg); }
+
+  100% {
+    -webkit-transform: rotateZ(5deg); } }
+
+@-webkit-keyframes morea-bounce {
+  0% {
+    top: 0px;
+    animation-timing-function: ease-in; }
+
+  37% {
+    top: -9px;
+    animation-timing-function: ease-out; }
+
+  55% {
+    top: 0px;
+    animation-timing-function: ease-in; }
+
+  73% {
+    top: -5px;
+    animation-timing-function: ease-out; }
+
+  82% {
+    top: 0px;
+    animation-timing-function: ease-in; }
+
+  91% {
+    top: -2px;
+    animation-timing-function: ease-out; }
+
+  100% {
+    top: 0px;
+    animation-timing-function: ease-in; } }
+
+@keyframes morea-bounce {
+  0% {
+    top: 0px;
+    animation-timing-function: ease-in; }
+
+  37% {
+    top: -9px;
+    animation-timing-function: ease-out; }
+
+  55% {
+    top: 0px;
+    animation-timing-function: ease-in; }
+
+  73% {
+    top: -5px;
+    animation-timing-function: ease-out; }
+
+  82% {
+    top: 0px;
+    animation-timing-function: ease-in; }
+
+  91% {
+    top: -2px;
+    animation-timing-function: ease-out; }
+
+  100% {
+    top: 0px;
+    animation-timing-function: ease-in; } }
+
 .morea {
   font-family: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
   line-height: 36px;
@@ -89,6 +167,16 @@
   /* '' */
   /* '' */
   /* '' */ }
+  .morea .bounce {
+    -webkit-animation: morea-bounce 0.8s ease 0 1;
+    -moz-animation: morea-bounce 0.8s ease 0 1;
+    -o-animation: morea-bounce 0.8s ease 0 1;
+    animation: morea-bounce 0.8s ease 0 1; }
+  .morea .wiggle {
+    -webkit-animation: morea-wiggle 0.2s ease 0 3;
+    -moz-animation: morea-wiggle 0.2s ease 0 3;
+    -o-animation: morea-wiggle 0.2s ease 0 3;
+    animation: morea-wiggle 0.2s ease 0 3; }
   .morea .animate-spin {
     -moz-animation: spin 2s infinite linear;
     -o-animation: spin 2s infinite linear;
@@ -149,13 +237,13 @@
   .morea.editing span {
     /* Unaligned, new link */ }
     .morea.editing span.selected {
-      background-color: #FFCB7C !important; }
+      border: 1px dotted #666 !important; }
     .morea.editing span[data-tooltip]:after {
       content: '\e80c';
-      color: #FFF;
+      color: #FFF !important;
       background-color: #5CB85C !important; }
     .morea.editing span:hover {
-      color: #FFF;
+      color: #FFF !important;
       background-color: #5CB85C !important; }
   .morea form {
     display: none; }
@@ -291,6 +379,11 @@
         background-color: #D15241; }
     .morea .sentence span {
       padding: 5px; }
+      .morea .sentence span.bounce {
+        color: #5CB85C; }
+      .morea .sentence span.wiggle {
+        color: #D15241;
+        border-bottom-style: dashed !important; }
       .morea .sentence span:hover {
         background-color: #F8D3A7;
         cursor: pointer; }
