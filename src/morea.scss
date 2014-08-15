@@ -351,7 +351,7 @@ $points-error-color: #D66556;
 		top: 5px;
 		margin: 5px;
 		padding: 5px;
-		background: #333;
+		background-color: #333;
 		border-radius: 3px;
 		width: auto;
 		display: inline-block;
@@ -552,6 +552,11 @@ $points-error-color: #D66556;
 			&:hover {
 				background-color: #F8D3A7;
 				cursor: pointer;
+			}
+
+			&.disabled {
+				pointer-events: none;
+				color: #999;
 			}
 
 			&.hovered {

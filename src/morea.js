@@ -111,13 +111,13 @@ define(function() {
 
 				// Erase unneeded alignment data from original sentence, store as answers
 				this.data[0].words.forEach(function(word) {
-					console.log(word.value, word.CTS, word.translations);
 					word.answers = that._clone(word.translations) || [];
 					word.answers = word.answers.filter(function(w) {
 						return that.config.targets.indexOf(w.lang) !== -1;
 					});
 					word.translations = [];
 				});
+				this._updateLoadingFeedback();
 
 				// Only fetch existing alignments if we're going to use them
 				if (this.config.mode !== 'create') {
@@ -158,14 +158,26 @@ define(function() {
 					callback(request.responseText);
 
 				this.renderSentence(sentence);
-				this.header.querySelector('.feedback').addClass('hidden'); 
-
+				this._updateLoadingFeedback();
 			}
-			else
-				console.log("");
+			else {
+				this.showFeedback("There was an error loading data.");
+			};
 		}.bind(this);
 
 		request.send();
+	};
+
+	morea.prototype._updateLoadingFeedback = function() {
+		var totalLangs = Object.keys(this.config.langs).length;
+		var finishedLangs = this.el.querySelectorAll('.sentence').length;
+
+		if (Object.keys(this.config.langs).length === this.el.querySelectorAll('.sentence').length) {
+			this.showFeedback('Done loading &mdash; get started!', true);
+		}
+		else {
+			this.showFeedback('Loading alignment ' + (finishedLangs + 1) + '/' + totalLangs);
+		}
 	};
 
 	/**
@@ -276,15 +288,11 @@ define(function() {
 			});
 			points += matches.length;
 
-			console.log(wordNodes[i].innerHTML, "\nguesses", guesses, "\nanswers", answers, "\nmatches", matches);
-			console.log("----");
-
 			if (matches.length === answers.length && answers.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bounce');
 			}
 			else if (guesses.length < answers.length) {
-				console.log("mark all guesses as incomplete");
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 				msg = msg.length === 0 ? "This phrase requires more words." : msg;
@@ -303,7 +311,7 @@ define(function() {
 
 		// Give user feedback
 		msg = msg.length === 0 ? "Great Job!" : msg;
-		this.showFeedback(msg);
+		this.showFeedback(msg, true);
 		this.updatePoints(points);
 	};
 
@@ -325,12 +333,13 @@ define(function() {
 		el.innerHTML = points;
 	};
 
-	morea.prototype.showFeedback = function(msg) {
+	morea.prototype.showFeedback = function(msg, autoHide) {
 		var el = this.header.querySelector('.feedback');
 		el.removeClass('hidden');
 		el.innerHTML = msg;
 
-		this._delayAddClass(el, 'hidden', 3000);
+		if (autoHide)
+			this._delayAddClass(el, 'hidden', 3000);
 	};
 
 	morea.prototype.createLink = function(e) {
@@ -474,9 +483,6 @@ define(function() {
 
 			for (var i = 0, word; word = words[i]; i++) {
 				if (links.indexOf(word.CTS) !== -1)  {
-
-					console.log(word, newWord);
-
 					// Splice out our targetCTS from links
 					that.removeTranslation(word, newWord);
 					that.removeTranslation(newWord, word);
@@ -690,7 +696,7 @@ define(function() {
 
 		// Add Buttons
 		var btnDone = document.createElement('a');
-		btnDone.innerHTML = 'Done';
+		btnDone.innerHTML = 'Link';
 		btnDone.className = 'btn';
 		btnDone.setAttribute('id', 'btn-done');
 		btnDone.setAttribute('href', '#');
@@ -735,7 +741,6 @@ define(function() {
 		// Feedback
 		var feedback = document.createElement('div');
 		feedback.className = 'feedback';
-		feedback.innerHTML = 'Loading Alignments...';
 		trackerContainer.appendChild(feedback);
 
 		// Editing Buttons
@@ -748,6 +753,8 @@ define(function() {
 		this.header.appendChild(trackerContainer);
 		this.header.appendChild(btnContainer);
 		this.el.appendChild(this.header);
+
+		this.showFeedback('Initializing Alignment Editor...');
 	};
 
 	morea.prototype.render = function(e) {
@@ -794,6 +801,10 @@ define(function() {
 			var translations = sentence.words[j].translations.map(function(word) {
 				return word.CTS;
 			}).toString();
+			
+			// Show users which words don't have alignments
+			if (this.config.mode === 'play' && sentence.words[j].answers.length === 0)
+				word.addClass('disabled');
 
 			word.setAttribute('data-translations', translations);
 			word.setAttribute('data-cts', sentence.words[j].CTS);
