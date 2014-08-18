@@ -175,6 +175,7 @@ define(function() {
 
 		if (Object.keys(this.config.langs).length === this.el.querySelectorAll('.sentence').length) {
 			this.showFeedback('Done loading &mdash; get started!', true);
+			this.config.starttime = new Date();
 		}
 		else {
 			this.showFeedback('Loading alignment ' + (finishedLangs + 1) + '/' + totalLangs);
@@ -241,6 +242,7 @@ define(function() {
 		this.unfocusNodes();
 
 		var wordNodes = this.el.querySelectorAll('span');
+		var newWords = this.el.querySelectorAll('.linked');
 
 		for (var i = 0; i < wordNodes.length; i++) {
 			wordNodes[i].removeClass('linked');
@@ -251,6 +253,28 @@ define(function() {
 
 		if (this.config.mode === 'play') {
 			this.checkAnswers();
+			
+			if (newWords.length === 0)
+				return;
+
+			// See which words, which were just updated, are right or wrong:
+			var accuracies = [], CTS = [], response = [];
+			for (var i = 0, node; node = newWords[i]; i++) {
+				CTS.push(node.dataset.cts);
+				response.push(node.innerHTML);
+
+				if (node.className.indexOf('bounce') !== -1)
+					accuracies.push(100);
+				else if (node.className.indexOf('wiggle') !== -1)
+					accuracies.push(0);
+				else
+					accuracies.push(50);
+			}
+			var accuracy = (_.reduce(accuracies, function(prev, curr) {
+				return prev + curr;
+			}, 0)) / accuracies.length;
+
+			this.sendSubmission(accuracy, CTS, response);
 		}
 	};
 	
@@ -262,7 +286,7 @@ define(function() {
 			return sentence.words;
 		}));
 
-		var msg = "", points = 0, accuracy = [];
+		var msg = "", points = 0;
 
 		for (var i = 0; i < wordNodes.length; i++) {
 			var CTS = wordNodes[i].dataset.cts;
@@ -292,19 +316,16 @@ define(function() {
 			if (matches.length === answers.length && answers.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bounce');
-				accuracy.push(100);
 			}
 			else if (guesses.length < answers.length) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 				msg = msg.length === 0 ? "This phrase requires more words." : msg;
-				accuracy.push((matches.length / answers.length) * 100);
 			}
 			else if (guesses.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('wiggle');
 				msg = msg.length === 0 ? "One or more of these words isn't right." : msg;
-				accuracy.push((matches.length / answers.length) * 100);
 			}
 			else {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
@@ -316,20 +337,9 @@ define(function() {
 		msg = msg.length === 0 ? "Great Job!" : msg;
 		this.showFeedback(msg, true);
 		this.updatePoints(points);
-		this._sendSubmission(accuracy);
 	};
 
-	morea.prototype._sendSubmission = function(accuracies) {
-		var accuracy = (_.reduce(accuracies, function(prev, curr) {
-			return prev + curr;
-		}, 0)) / accuracies.length;
-		var refs = this.el.querySelectorAll('span[data-translations^="urn"]');
-		var response = [], CTSes = [];
-		for (var i = 0, ref; ref = refs[i]; i++) {
-			response.push(ref.innerHTML);
-			CTSes.push(ref.dataset.cts);
-		}
-
+	morea.prototype.sendSubmission = function(accuracy, CTS, response) {
 		var eventType = 'submitted';
 		var e;
 		// If Custom event is available, we want this to trasmit data via event about what user has just done 
@@ -337,9 +347,10 @@ define(function() {
 			var detail = {
 				"detail": {
 					"accuracy": accuracy,
-					"task": "build_parse_tree",
+					"task": "align_sentence",
 					"response": response,
-					"encounteredWords": CTSes
+					"encounteredWords": CTS,
+					"starttime": this.config.starttime
 				}
 			};
 			e = new CustomEvent(eventType, detail);
