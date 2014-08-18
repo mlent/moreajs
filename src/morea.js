@@ -75,9 +75,9 @@ define(function() {
 			if (this.config.mode !== 'create')
 				url += '?full=True';
 
-			this._fetchData(url, function(responseText) {
+			this._fetchData(url, function(response) {
 				var that = this;
-				this.data[0] = JSON.parse(responseText);
+				this.data[0] = response;
 
 				// Get the available languages
 				var langs = Object.keys(this.data[0].translations);
@@ -133,6 +133,7 @@ define(function() {
 
 	morea.prototype._fetchData = function(dataUrl, callback) {
 		var request = new XMLHttpRequest();
+		request.responseType = 'json';
 		request.open('GET', dataUrl, true);
 
 		request.onload = function() {
@@ -140,7 +141,7 @@ define(function() {
 
 				// Render this sentence
 				var that = this;
-				var sentence = JSON.parse(request.responseText);
+				var sentence = request.response;
 				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
 
 				// Ensure that each word has a translation field. Erase if not in edit mode.
@@ -155,7 +156,7 @@ define(function() {
 
 				// Perform callback if needed
 				if (callback)
-					callback(request.responseText);
+					callback(request.response);
 
 				this.renderSentence(sentence);
 				this._updateLoadingFeedback();
@@ -261,7 +262,7 @@ define(function() {
 			return sentence.words;
 		}));
 
-		var msg = "", points = 0;
+		var msg = "", points = 0, accuracy = [];
 
 		for (var i = 0; i < wordNodes.length; i++) {
 			var CTS = wordNodes[i].dataset.cts;
@@ -291,28 +292,63 @@ define(function() {
 			if (matches.length === answers.length && answers.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bounce');
+				accuracy.push(100);
 			}
 			else if (guesses.length < answers.length) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 				msg = msg.length === 0 ? "This phrase requires more words." : msg;
+				accuracy.push((matches.length / answers.length) * 100);
 			}
 			else if (guesses.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('wiggle');
 				msg = msg.length === 0 ? "One or more of these words isn't right." : msg;
+				accuracy.push((matches.length / answers.length) * 100);
 			}
 			else {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
 			}
-			
 		}
 
 		// Give user feedback
 		msg = msg.length === 0 ? "Great Job!" : msg;
 		this.showFeedback(msg, true);
 		this.updatePoints(points);
+		this._sendSubmission(accuracy);
+	};
+
+	morea.prototype._sendSubmission = function(accuracies) {
+		var accuracy = (_.reduce(accuracies, function(prev, curr) {
+			return prev + curr;
+		}, 0)) / accuracies.length;
+		var refs = this.el.querySelectorAll('span[data-translations^="urn"]');
+		var response = [], CTSes = [];
+		for (var i = 0, ref; ref = refs[i]; i++) {
+			response.push(ref.innerHTML);
+			CTSes.push(ref.dataset.cts);
+		}
+
+		var eventType = 'submitted';
+		var e;
+		// If Custom event is available, we want this to trasmit data via event about what user has just done 
+		if (window.CustomEvent) {
+			var detail = {
+				"detail": {
+					"accuracy": accuracy,
+					"task": "build_parse_tree",
+					"response": response,
+					"encounteredWords": CTSes
+				}
+			};
+			e = new CustomEvent(eventType, detail);
+		}
+		else {
+			e = document.createEvent(eventType);	
+		}
+		console.log(detail.detail);
+		this.el.dispatchEvent(e);
 	};
 
 	morea.prototype.updatePoints = function(points) {
