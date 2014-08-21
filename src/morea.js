@@ -133,15 +133,15 @@ define(function() {
 
 	morea.prototype._fetchData = function(dataUrl, callback) {
 		var request = new XMLHttpRequest();
-		request.responseType = 'json';
 		request.open('GET', dataUrl, true);
+		request.responseType = 'json';
 
 		request.onload = function() {
 			if (request.status >= 200 && request.status < 400) {
 
 				// Render this sentence
 				var that = this;
-				var sentence = request.response;
+				var sentence = JSON.parse(request.response);
 				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
 
 				// Ensure that each word has a translation field. Erase if not in edit mode.
@@ -156,7 +156,7 @@ define(function() {
 
 				// Perform callback if needed
 				if (callback)
-					callback(request.response);
+					callback(sentence);
 
 				this.renderSentence(sentence);
 				this._updateLoadingFeedback();
