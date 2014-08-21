@@ -109,14 +109,6 @@ define(function() {
 					"dir": "ltr"
 				};
 
-				// Erase unneeded alignment data from original sentence, store as answers
-				this.data[0].words.forEach(function(word) {
-					word.answers = that._clone(word.translations) || [];
-					word.answers = word.answers.filter(function(w) {
-						return that.config.targets.indexOf(w.lang) !== -1;
-					});
-					word.translations = [];
-				});
 				this._updateLoadingFeedback();
 
 				// Only fetch existing alignments if we're going to use them
@@ -133,21 +125,31 @@ define(function() {
 
 	morea.prototype._fetchData = function(dataUrl, callback) {
 		var request = new XMLHttpRequest();
+		dataUrl += '&format=json';
 		request.open('GET', dataUrl, true);
-		request.responseType = 'json';
+		//request.responseType = 'json';
 
 		request.onload = function() {
 			if (request.status >= 200 && request.status < 400) {
 
 				// Render this sentence
 				var that = this;
-				var sentence = JSON.parse(request.response);
+
+				// Firefox not recognizing responseType = 'json'...
+				var sentence = request.responseText;
+				if (typeof(sentence) !== 'object') {
+					sentence = JSON.parse(sentence);
+				}
+
 				sentence.lang = sentence.words[0].lang;		// TODO: derive from CTS
 
 				// Ensure that each word has a translation field. Erase if not in edit mode.
 				if (this.config.mode === 'play') {
 					sentence.words.forEach(function(word) {
 						word.answers = that._clone(word.translations) || [];
+						word.answers = word.answers.filter(function(w) {
+							return that.config.targets.indexOf(w.lang) !== -1;
+						});
 						word.translations = [];
 					});
 				}
@@ -155,18 +157,20 @@ define(function() {
 				this.data.push(sentence);
 
 				// Perform callback if needed
-				if (callback)
+				if (callback) {
 					callback(sentence);
+				}
 
 				this.renderSentence(sentence);
 				this._updateLoadingFeedback();
 			}
 			else {
 				this.showFeedback("There was an error loading data.");
-			};
+			}
+
 		}.bind(this);
 
-		request.send();
+		request.send(null);
 	};
 
 	morea.prototype._updateLoadingFeedback = function() {
@@ -187,7 +191,7 @@ define(function() {
 	 */
 	morea.prototype.focusNode = function(e) {
 
-		var translations = e.toElement.dataset.translations.split(",");
+		var translations = e.target.dataset.translations.split(",");
 		var wordNodes = this.el.querySelectorAll('span');
 
 		var matches = this._getAllRelatedAlignments(translations);
@@ -211,7 +215,7 @@ define(function() {
 
 		// If they're already , modify links (add/remove) 
 		if (this.el.className.indexOf('editing') !== -1) {
-			if (e.toElement.className.indexOf('linked') !== -1)
+			if (e.target.className.indexOf('linked') !== -1)
 				this.removeLink(e);
 			else
 				this.createLink(e);
@@ -220,10 +224,10 @@ define(function() {
 		}
 
 		// Otherwise, "intialize" editing environment -- put el in edit mode, highlight existing links
-		e.toElement.addClass('selected');
-		e.toElement.addClass('linked');
+		e.target.addClass('selected');
+		e.target.addClass('linked');
 
-		var translations = e.toElement.dataset.translations.split(",");
+		var translations = e.target.dataset.translations.split(",");
 		var matches = this._getAllRelatedAlignments(translations);
 
 		this.el.addClass('editing');
@@ -390,11 +394,11 @@ define(function() {
 	};
 
 	morea.prototype.createLink = function(e) {
-		e.toElement.addClass('linked');
-		e.toElement.addClass('hovered');
+		e.target.addClass('linked');
+		e.target.addClass('hovered');
 
 		// Update our internal data structure
-		var targetCTS = e.toElement.dataset.cts;
+		var targetCTS = e.target.dataset.cts;
 		var linkNodes = Array.prototype.slice.call(this.el.querySelectorAll('.linked'));
 		linkNodes = linkNodes.concat(Array.prototype.slice.call(this.el.querySelectorAll('.hovered')));
 
@@ -505,11 +509,11 @@ define(function() {
 	};
 
 	morea.prototype.removeLink = function(e) {
-		e.toElement.removeClass('linked');
-		e.toElement.removeClass('hovered');
+		e.target.removeClass('linked');
+		e.target.removeClass('hovered');
 
 		// Update our internal data structure
-		var targetCTS = e.toElement.dataset.cts;
+		var targetCTS = e.target.dataset.cts;
 		var linkNodes = Array.prototype.slice.call(this.el.querySelectorAll('.linked'));
 		linkNodes = linkNodes.concat(Array.prototype.slice.call(this.el.querySelectorAll('.selected')));
 
@@ -849,9 +853,9 @@ define(function() {
 				return word.CTS;
 			}).toString();
 			
-			// Show users which words don't have alignments
+			/* Show users which words don't have alignments
 			if (this.config.mode === 'play' && sentence.words[j].answers.length === 0)
-				word.addClass('disabled');
+				word.addClass('disabled');*/
 
 			word.setAttribute('data-translations', translations);
 			word.setAttribute('data-cts', sentence.words[j].CTS);
