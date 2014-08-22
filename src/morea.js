@@ -267,7 +267,7 @@ define(function() {
 				CTS.push(node.dataset.cts);
 				response.push(node.innerHTML);
 
-				if (node.className.indexOf('bounce') !== -1)
+				if (node.className.indexOf('bou') !== -1)
 					accuracies.push(100);
 				else if (node.className.indexOf('wiggle') !== -1)
 					accuracies.push(0);
@@ -307,7 +307,7 @@ define(function() {
 
 			if (guesses.length === 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
-				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bou');
 				continue;
 			}
 
@@ -319,21 +319,21 @@ define(function() {
 
 			if (matches.length === answers.length && answers.length !== 0) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
-				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bounce');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('bou');
 			}
 			else if (guesses.length < answers.length) {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
-				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bou');
 				msg = msg.length === 0 ? "This phrase requires more words." : msg;
 			}
 			else if (guesses.length !== 0) {
-				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bou');
 				this.el.querySelector('span[data-cts="' + CTS + '"]').addClass('wiggle');
 				msg = msg.length === 0 ? "One or more of these words isn't right." : msg;
 			}
 			else {
 				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('wiggle');
-				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bounce');
+				this.el.querySelector('span[data-cts="' + CTS + '"]').removeClass('bou');
 			}
 		}
 
@@ -370,9 +370,9 @@ define(function() {
 		var el = this.header.querySelector('.points');
 		var currPoints = parseInt(el.innerHTML);
 		if (points > currPoints) {
-			el.addClass('bounce');
+			el.addClass('bou');
 			el.addClass('success');
-			this._delayRemoveClass(el, 'bounce', 3000);
+			this._delayRemoveClass(el, 'bou', 3000);
 			this._delayRemoveClass(el, 'success', 3000);
 		}
 		else if (points < currPoints) {

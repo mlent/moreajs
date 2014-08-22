@@ -27,65 +27,135 @@
 
 @-webkit-keyframes morea-bounce {
   0% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; }
 
   37% {
-    top: -9px;
+    -webkit-transform: translateY(0em) translateY(-0.9em);
+    -moz-transform: translateY(0em) translateY(-0.9em);
+    transform: translateY(0em) translateY(-0.9em);
     animation-timing-function: ease-out; }
 
   55% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; }
 
   73% {
-    top: -5px;
+    transform: translateY(0em) translateY(-0.5em);
+    -moz-transform: translateY(0em) translateY(-0.5em);
+    -webkit-transform: translateY(0em) translateY(-0.5em);
     animation-timing-function: ease-out; }
 
   82% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; }
 
   91% {
-    top: -2px;
+    -moz-transform: translateY(0em) translateY(-0.2em);
+    -webkit-transform: translateY(0em) translateY(-0.2em);
+    transform: translateY(0em) translateY(-0.2em);
     animation-timing-function: ease-out; }
 
   100% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
+    animation-timing-function: ease-in; } }
+
+@-moz-keyframes morea-bounce {
+  0% {
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
+    animation-timing-function: ease-in; }
+
+  37% {
+    -webkit-transform: translateY(0em) translateY(-0.9em);
+    -moz-transform: translateY(0em) translateY(-0.9em);
+    transform: translateY(0em) translateY(-0.9em);
+    animation-timing-function: ease-out; }
+
+  55% {
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
+    animation-timing-function: ease-in; }
+
+  73% {
+    transform: translateY(0em) translateY(-0.5em);
+    -moz-transform: translateY(0em) translateY(-0.5em);
+    -webkit-transform: translateY(0em) translateY(-0.5em);
+    animation-timing-function: ease-out; }
+
+  82% {
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
+    animation-timing-function: ease-in; }
+
+  91% {
+    -moz-transform: translateY(0em) translateY(-0.2em);
+    -webkit-transform: translateY(0em) translateY(-0.2em);
+    transform: translateY(0em) translateY(-0.2em);
+    animation-timing-function: ease-out; }
+
+  100% {
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; } }
 
 @keyframes morea-bounce {
   0% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; }
 
   37% {
-    top: -9px;
+    -webkit-transform: translateY(0em) translateY(-0.9em);
+    -moz-transform: translateY(0em) translateY(-0.9em);
+    transform: translateY(0em) translateY(-0.9em);
     animation-timing-function: ease-out; }
 
   55% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; }
 
   73% {
-    top: -5px;
+    transform: translateY(0em) translateY(-0.5em);
+    -moz-transform: translateY(0em) translateY(-0.5em);
+    -webkit-transform: translateY(0em) translateY(-0.5em);
     animation-timing-function: ease-out; }
 
   82% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; }
 
   91% {
-    top: -2px;
+    -moz-transform: translateY(0em) translateY(-0.2em);
+    -webkit-transform: translateY(0em) translateY(-0.2em);
+    transform: translateY(0em) translateY(-0.2em);
     animation-timing-function: ease-out; }
 
   100% {
-    top: 0px;
+    -webkit-transform: translateY(0em);
+    -moz-transform: translateY(0em);
+    transform: translateY(0em);
     animation-timing-function: ease-in; } }
 
 .morea {
   font-family: "Myriad Pro", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-  line-height: 36px;
   @-moz-keyframes spin {
     0% {
       -moz-transform: rotate(0deg);
@@ -167,16 +237,6 @@
   /* '' */
   /* '' */
   /* '' */ }
-  .morea .bounce {
-    -webkit-animation: morea-bounce 0.8s ease 0 1;
-    -moz-animation: morea-bounce 0.8s ease 0 1;
-    -o-animation: morea-bounce 0.8s ease 0 1;
-    animation: morea-bounce 0.8s ease 0 1; }
-  .morea .wiggle {
-    -webkit-animation: morea-wiggle 0.2s ease 0 3;
-    -moz-animation: morea-wiggle 0.2s ease 0 3;
-    -o-animation: morea-wiggle 0.2s ease 0 3;
-    animation: morea-wiggle 0.2s ease 0 3; }
   .morea .animate-spin {
     -moz-animation: spin 2s infinite linear;
     -o-animation: spin 2s infinite linear;
@@ -396,7 +456,6 @@
     padding: 20px;
     box-sizing: border-box;
     position: relative;
-    line-height: 60px;
     /* Close button */ }
     .morea .sentence:first-child {
       border-left: 1px dotted #DDD; }
@@ -449,12 +508,24 @@
       .morea .sentence a:hover {
         background-color: #D15241; }
     .morea .sentence span {
-      padding: 5px; }
-      .morea .sentence span.bounce {
-        color: #5CB85C; }
+      padding: 5px;
+      display: inline-block;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      line-height: 18px; }
+      .morea .sentence span.bou {
+        color: #5CB85C;
+        -webkit-animation: morea-bounce 0.8s ease 0 1;
+        -moz-animation: morea-bounce 0.8s ease 0 1;
+        -o-animation: morea-bounce 0.8s ease 0 1;
+        animation: morea-bounce 0.8s ease 0 1; }
       .morea .sentence span.wiggle {
         color: #D15241;
-        border-bottom-style: dashed !important; }
+        border-bottom-style: dashed !important;
+        -webkit-animation: morea-wiggle 0.2s ease 0 3;
+        -moz-animation: morea-wiggle 0.2s ease 0 3;
+        -o-animation: morea-wiggle 0.2s ease 0 3;
+        animation: morea-wiggle 0.2s ease 0 3; }
       .morea .sentence span:hover {
         background-color: #F8D3A7;
         cursor: pointer; }
