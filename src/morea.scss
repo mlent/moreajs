@@ -9,11 +9,11 @@
 	font-style: normal;
 }
 
-@mixin animate($name, $duration, $timing-function, $delay, $iteration-count) {
-	-webkit-animation: $name $duration $timing-function $delay $iteration-count;
-	-moz-animation: $name $duration $timing-function $delay $iteration-count;
-	-o-animation: $name $duration $timing-function $delay $iteration-count;
-	animation: $name $duration $timing-function $delay $iteration-count;
+@mixin animate($name, $duration, $iteration-count, $timing-function) {
+	-webkit-animation: $name $duration $iteration-count $timing-function;
+	-moz-animation: $name $duration $iteration-count $timing-function;
+	-o-animation: $name $duration $iteration-count $timing-function;
+	animation: $name $duration $iteration-count $timing-function;
 }
 @-webkit-keyframes morea-wiggle {
 	0% {
@@ -532,13 +532,13 @@ $points-error-color: #D66556;
 
 			&.bou {
 				color: #5CB85C;
-				@include animate(morea-bounce, .8s, ease, 0, 1);
+				@include animate(morea-bounce, .8s, 1, ease);
 			}
 
 			&.wiggle {
 				color: #D15241;
 				border-bottom-style: dashed !important;
-				@include animate(morea-wiggle, .2s, ease, 0, 3);
+				@include animate(morea-wiggle, .2s, 3, ease);
 			}
 
 			&:hover {

@@ -515,17 +515,17 @@
       line-height: 18px; }
       .morea .sentence span.bou {
         color: #5CB85C;
-        -webkit-animation: morea-bounce 0.8s ease 0 1;
-        -moz-animation: morea-bounce 0.8s ease 0 1;
-        -o-animation: morea-bounce 0.8s ease 0 1;
-        animation: morea-bounce 0.8s ease 0 1; }
+        -webkit-animation: morea-bounce 0.8s 1 ease;
+        -moz-animation: morea-bounce 0.8s 1 ease;
+        -o-animation: morea-bounce 0.8s 1 ease;
+        animation: morea-bounce 0.8s 1 ease; }
       .morea .sentence span.wiggle {
         color: #D15241;
         border-bottom-style: dashed !important;
-        -webkit-animation: morea-wiggle 0.2s ease 0 3;
-        -moz-animation: morea-wiggle 0.2s ease 0 3;
-        -o-animation: morea-wiggle 0.2s ease 0 3;
-        animation: morea-wiggle 0.2s ease 0 3; }
+        -webkit-animation: morea-wiggle 0.2s 3 ease;
+        -moz-animation: morea-wiggle 0.2s 3 ease;
+        -o-animation: morea-wiggle 0.2s 3 ease;
+        animation: morea-wiggle 0.2s 3 ease; }
       .morea .sentence span:hover {
         background-color: #F8D3A7;
         cursor: pointer; }
