@@ -595,6 +595,9 @@ define(function() {
 		
 		// Then get all words where a word in alignments is in one of their translations
 		for (var i = 0; i < words.length; i++) {
+			if (!words[i].translations)
+				continue;
+
 			var toCheck = words[i].translations.map(function(el) {
 				return el.CTS;	
 			});
@@ -849,9 +852,12 @@ define(function() {
 			var word = document.createElement('span');
 			word.innerHTML = sentence.words[j].value;
 
-			var translations = sentence.words[j].translations.map(function(word) {
-				return word.CTS;
-			}).toString();
+			var translations = '';
+			if (sentence.words[j].translations) {
+				translations = sentence.words[j].translations.map(function(word) {
+					return word.CTS;
+				}).toString();
+			}
 			
 			/* Show users which words don't have alignments
 			if (this.config.mode === 'play' && sentence.words[j].answers.length === 0)
