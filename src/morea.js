@@ -78,22 +78,28 @@ define(function() {
 			this._fetchData(url, function(response) {
 				var that = this;
 				this.data[0] = response;
-
-				// Get the available languages
-				var langs = Object.keys(this.data[0].translations);
-
-				// Filter out so we're only returning target languages
-				langs = langs.filter(function(l) {
-					if (that.config.targets.length === 0)
-						return true;
-					else
-						return that.config.targets.indexOf(l) !== -1;
-				});
+				var langs;
 
 				// TODO: replace all this gnarly code, when we have lang at doc level. Should come in to us as a config.
 				// This config setting should be set by some translation engine outside of this plugin
+
+				// For play or edit, must be working on languages currently in index
+				if (this.config.mode !== 'create') { 
+
+					// Filter out so we're only returning target languages
+					langs = Object.keys(this.data[0].translations).filter(function(l) {
+						if (that.config.targets.length === 0)
+							return true;
+						else
+							return that.config.targets.indexOf(l) !== -1;
+					});
+				}
+				else {
+					langs = ['fr', 'en', 'fa', 'hr', 'de', 'pt'];
+				}
+
 				this.config.langs = langs.reduce(function(map, el) { 
-					var eng = { "fr": "French", "en": "English", "fa": "Farsi", "hr": "Croatian"};
+					var eng = { "fr": "French", "en": "English", "fa": "Farsi", "hr": "Croatian", "de": "German", "pt": "Portuguese"};
 					map[el] = {
 						"hr": eng[el],
 						"dir": (el === 'fa') ? 'rtl' : 'ltr',
@@ -125,10 +131,9 @@ define(function() {
 
 	morea.prototype._fetchData = function(dataUrl, callback) {
 		var request = new XMLHttpRequest();
-		dataUrl += '&format=json';
-		request.open('GET', dataUrl, true);
-		//request.responseType = 'json';
+		dataUrl += (this.config.mode !== 'create') ? '&format=json' : '';
 
+		request.open('GET', dataUrl, true);
 		request.onload = function() {
 			if (request.status >= 200 && request.status < 400) {
 
@@ -177,7 +182,7 @@ define(function() {
 		var totalLangs = Object.keys(this.config.langs).length;
 		var finishedLangs = this.el.querySelectorAll('.sentence').length;
 
-		if (Object.keys(this.config.langs).length === this.el.querySelectorAll('.sentence').length) {
+		if ((Object.keys(this.config.langs).length === this.el.querySelectorAll('.sentence').length) || this.config.mode === 'create') {
 			this.showFeedback('Done loading &mdash; get started!', true);
 			this.config.starttime = new Date();
 		}
@@ -485,6 +490,9 @@ define(function() {
 
 			// Check each destination, whether source is already in its translations array
 			for (var i = 0; i < dest.length; i++) {
+
+				// Brand new alignments, with no existing translations, don't have this field yet
+				dest[i].translations = dest[i].translations || [];
 				var isNew = (dest[i].translations.filter(function(word) {
 					return word.CTS === source.CTS;
 				}).length === 0);
@@ -548,6 +556,10 @@ define(function() {
 	 * @param {object} dest - Word to be removed from source as a translation.
 	 */
 	morea.prototype.removeTranslation = function(source, dest) {
+
+		// If they never formed a link, simply return
+		if (!dest.translations)
+			return;
 
 		// Update data structure 
 		dest.translations = dest.translations.filter(function(obj) {
