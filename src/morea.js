@@ -212,6 +212,10 @@ define(function() {
 	 * Clicking a node allows you to edit the links it has.
 	 */
 	morea.prototype.editNode = function(e) {
+
+		if (this.config.mode === 'view')
+			return false;
+
 		var wordNodes = this.el.querySelectorAll('span');
 
 		// Close Form if it's open
@@ -783,7 +787,7 @@ define(function() {
 		trackerContainer.className = 'tracker';
 
 		// Only users who are editing or creating can add their own translation
-		if (this.config.mode !== 'play') {
+		if (this.config.mode === 'create') {
 
 			// Add Translation Link
 			var btnAddTrans = document.createElement('a');
@@ -795,8 +799,8 @@ define(function() {
 			btnAddTrans.addEventListener('click', this.toggleForm.bind(this));
 			this.header.appendChild(btnAddTrans);
 		}
-		else {
 
+		if (this.config.mode === 'play') {
 			// Only append points if in play mode
 			var points = document.createElement('div');
 			points.className = 'points';
