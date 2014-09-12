@@ -31,7 +31,7 @@ define(function() {
 		mode: 'edit',
 		data: [],						// Array of sentence objects
 		dataUrl: undefined,				// Or an endpoint + callback to process the data
-		orientation: 'horizontal',
+		orientation: 'vertical',
 		user: 'tester',
 		targets: []
 	};
@@ -43,7 +43,6 @@ define(function() {
 		this.config = this._extend({}, this.defaults, this.options);
 		
 		this._addEvent(window, "resize", this._toggleOrientation.bind(this));
-		this.el.addClass('horizontal');
 
 		this.render();
 
