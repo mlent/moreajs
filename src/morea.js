@@ -28,7 +28,7 @@ define(function() {
 	};
 
 	morea.prototype.defaults = {
-		mode: 'edit',
+		mode: 'display',
 		data: [],						// Array of sentence objects
 		dataUrl: undefined,				// Or an endpoint + callback to process the data
 		orientation: 'vertical',
@@ -212,7 +212,7 @@ define(function() {
 	 */
 	morea.prototype.editNode = function(e) {
 
-		if (this.config.mode === 'view')
+		if (this.config.mode === 'display')
 			return false;
 
 		var wordNodes = this.el.querySelectorAll('span');
@@ -759,6 +759,9 @@ define(function() {
 		this.header = document.createElement('div');
 		this.header.className = 'header';
 
+		// Hide the header if they're only in display mode
+		if (this.config.mode === 'display') this.header.style.display = 'none';
+
 		// Button container
 		var btnContainer = document.createElement('div');
 		btnContainer.className = 'btn-container';
@@ -823,7 +826,11 @@ define(function() {
 		this.header.appendChild(btnContainer);
 		this.el.appendChild(this.header);
 
-		this.showFeedback('Initializing Alignment Editor...');
+		// Show this if we haven't already given manual data
+		if (this.config.data.length === 0)
+			this.showFeedback('Initializing Alignment Editor...');
+		else
+			this.showFeedback('Done Loading', true);
 	};
 
 	morea.prototype.render = function(e) {
