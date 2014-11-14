@@ -645,7 +645,7 @@ define(function() {
 
 	morea.prototype._toggleOrientation = function(e) {
 
-		if (this.el.offsetWidth < 1000)
+		if (this.el.offsetWidth < 1000 || this.el.offsetWidth == 0)
 			this.el.addClass('horizontal')
 		else
 			this.el.removeClass('horizontal');
